@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, WildAndroidActivity!</string>
+    <string name="app_name">WildPlot</string>
+    <string name="settings_fragment">Einstellungen</string>
+    <string name="calc_fragment">Rechner</string>
+    <string name="plot_fragment">Plot</string>
+    <string name="ode_fragment">ODE start</string>
+    <string name="integrator_fragment">Integrator</string>
+
+    <string name="reset_all">alles zurücksetzen</string>
+    <string name="range_settings">Bereichsgrenzen</string>
+    <string name="x_range">x-Bereich</string>
+    <string name="y_range">y-Bereich</string>
+    <string name="log_x">logarithmische x-Achse</string>
+    <string name="log_y">logarithmische y-Achse</string>
+    <string name="border_frame_grid_settings">Rahmen/Grid-Optionen</string>
+    <string name="framed">Rahmen</string>
+    <string name="grid">Grid</string>
+    <string name="hand_drawn_settings">Touch-Punkte Darstellung</string>
+    <string name="points_radio_option">Punkte</string>
+    <string name="linespoints_radio_option">linespoints</string>
+    <string name="splines_radio_option">splines</string>
+    
+    <string name="int_number_steps">Schrittanzahl:</string>
+    <string name="int_start_integrator">Start Integrator</string>
+    
+    <string name="ode_number_steps">Schrittanzahl:</string>
+    <string name="ode_start_integrator">Start ODE-Solver</string>
+</resources>

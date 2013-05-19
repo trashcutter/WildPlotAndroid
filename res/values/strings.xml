@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ash_update_points">update settings from points</string>
+    <string name="ash_settings">Histogram settings</string>
+    <string name="ash_width">width (x,y)</string>
+    <string name="ash_origin">origin (x,y)</string>
+    <string name="ash_m">M (x,y)</string>
+    <string name="hello">Hello World, WildAndroidActivity!</string>
+    <string name="app_name">WildPlot</string>
+    <string name="settings_fragment">Settings</string>
+    <string name="calc_fragment">Calc</string>
+    <string name="plot_fragment">Plot</string>
+    <string name="ode_fragment">ODE start</string>
+    <string name="integrator_fragment">Integrator</string>
+    
+    <string name="reset_all">reset everything</string>
+    <string name="range_settings">Range Settings</string>
+    <string name="x_range">x-range</string>
+    <string name="y_range">y-range</string>
+    <string name="log_x">logarithmic x-axis</string>
+    <string name="log_y">logarithmic y-axis</string>
+    <string name="border_frame_grid_settings">Border/Frame/Grid Settings</string>
+    <string name="framed">Framed</string>
+    <string name="grid">Grid</string>
+    <string name="hand_drawn_settings">Hand Drawn Points Settings</string>
+    <string name="points_radio_option">points</string>
+    <string name="linespoints_radio_option">linespoints</string>
+    <string name="splines_radio_option">splines</string>
+
+    <string name="int_number_steps">Number of steps:</string>
+    <string name="int_preset_number_steps">20000</string>
+    <string name="int_start_integrator">start Integrator</string>
+    
+    <string name="ode_number_steps">Number of steps:</string>
+    <string name="ode_preset_number_steps">20000</string>
+    <string name="ode_start_integrator">start ODE solver</string>
+</resources>

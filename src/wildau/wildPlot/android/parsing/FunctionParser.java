@@ -111,7 +111,7 @@ public class FunctionParser {
 	/**
 	 * This method computes the image value of a declared, 'n'-dimensional function for an array of 'n' domain values.
 	 * @param functionName name of the function which image value should be computed
-	 * @param inputVariable array containing all required domain values
+	 * @param inputVariables array containing all required domain values
 	 * @return image value
 	 */
 	public double getFunctionOutput(String functionName, double[] inputVariables){
@@ -129,7 +129,7 @@ public class FunctionParser {
 	 * This method computes and prints the image value of a 'n'-dimensional function for an array of 'n' domain 
 	 * values if the given function has already been declared.
 	 * @param functionName name of the function which image value should be computed
-	 * @param inputVariable array containing all required domain values
+	 * @param inputVariables array containing all required domain values
 	 * @return whether function has been declared or not
 	 */
 	public boolean parseGetFX(String functionName, String[] inputVariables){

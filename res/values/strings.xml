@@ -35,4 +35,8 @@
     <string name="ode_number_steps">Number of steps:</string>
     <string name="ode_preset_number_steps">20000</string>
     <string name="ode_start_integrator">start ODE solver</string>
+    <string name="ash_regression_check_text">Regression</string>
+    <string name="ash_k_fold">K-Fold</string>
+    <string name="ash_regression_m">M</string>
+    <string name="ash_lambda">Lambda</string>
 </resources>

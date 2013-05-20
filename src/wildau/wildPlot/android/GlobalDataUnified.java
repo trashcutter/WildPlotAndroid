@@ -251,6 +251,7 @@ public class GlobalDataUnified extends Application {
 		this.updated = true;
 	}
 	public AdvancedPlotSheet getPlotSheet() {
+		updatePoints();
 		this.plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend);
 		xaxis = new XAxis(plotSheet, 0, xTicPixelDistance, xMinorTicPixelDistance);
 		yaxis = new YAxis(plotSheet, 0, yTicPixelDistance, yMinorTicPixelDistance);
@@ -304,7 +305,6 @@ public class GlobalDataUnified extends Application {
 		
 		
 		if(this.xPointVector.size() > 0){
-            updatePoints();
 			//draw hand drawn points
 			switch(this.touchPointType) {
 			case 0: PointDrawer2D pointDrawer = new PointDrawer2D(plotSheet, this.touchPoints, touchPointColor);

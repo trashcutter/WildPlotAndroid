@@ -5,7 +5,8 @@
     <string name="ash_width">width (x,y)</string>
     <string name="ash_origin">origin (x,y)</string>
     <string name="ash_m">M (x,y)</string>
-    <string name="hello">Hello World, WildAndroidActivity!</string>
+    <string name="ash_regression_settings">Regression settings</string>
+	<string name="hello">Hello World, WildAndroidActivity!</string>
     <string name="app_name">WildPlot</string>
     <string name="settings_fragment">Settings</string>
     <string name="calc_fragment">Calc</string>

@@ -2,6 +2,7 @@ package wildau.wildPlot.android.newParsing;
 
 
 public class Expression {
+    private TopLevelParser parser;
     public static enum ExpressionType { EXP_PLUS_TERM, EXP_MINUS_TERM, TERM, INVALID};
     private ExpressionType expressionType = ExpressionType.INVALID;
     private Expression expression = null;
@@ -10,7 +11,8 @@ public class Expression {
     private Factor yVariableFactor = null;
     
     
-    public Expression(String expressionString){
+    public Expression(String expressionString, TopLevelParser parser){
+        this.parser = parser;
         boolean isReady = false;
         
         isReady = initAsExpPlusTerm(expressionString);
@@ -28,7 +30,7 @@ public class Expression {
             if(expressionString.charAt(i) == '+'){
                 boolean isValidFirstPartExpression = false;
                 String leftSubString = expressionString.substring(0, i);
-                Expression leftExpression = new Expression(leftSubString);
+                Expression leftExpression = new Expression(leftSubString, parser);
                 isValidFirstPartExpression = leftExpression.getExpressionType() != ExpressionType.INVALID;
                 
                 if(!isValidFirstPartExpression)
@@ -36,7 +38,7 @@ public class Expression {
                 
                 boolean isValidSecondPartTerm = false;
                 String rightSubString = expressionString.substring(i+1, expressionString.length());
-                Term rightTerm = new Term(rightSubString);
+                Term rightTerm = new Term(rightSubString, parser);
                 isValidSecondPartTerm = rightTerm.getTermType() != Term.TermType.INVALID;
                 
                 if(isValidSecondPartTerm){
@@ -55,7 +57,7 @@ public class Expression {
             if(expressionString.charAt(i) == '-'){
                 boolean isValidFirstPartExpression = false;
                 String leftSubString = expressionString.substring(0, i);
-                Expression leftExpression = new Expression(leftSubString);
+                Expression leftExpression = new Expression(leftSubString, parser);
                 isValidFirstPartExpression = leftExpression.getExpressionType() != ExpressionType.INVALID;
                 
                 if(!isValidFirstPartExpression)
@@ -63,7 +65,7 @@ public class Expression {
                 
                 boolean isValidSecondPartTerm = false;
                 String rightSubString = expressionString.substring(i+1, expressionString.length());
-                Term rightTerm = new Term(rightSubString);
+                Term rightTerm = new Term(rightSubString, parser);
                 isValidSecondPartTerm = rightTerm.getTermType() != Term.TermType.INVALID;
                 
                 if(isValidSecondPartTerm){
@@ -79,7 +81,7 @@ public class Expression {
     }
     
     private boolean initAsTerm(String expressionString){
-        Term term = new Term(expressionString);
+        Term term = new Term(expressionString, parser);
         boolean isValidTerm = term.getTermType() != Term.TermType.INVALID;
         if(isValidTerm){
             this.expressionType = ExpressionType.TERM;
@@ -92,6 +94,20 @@ public class Expression {
     
     public ExpressionType getExpressionType(){
         return expressionType;
+    }
+
+    public double getValue() throws ExpressionFormatException{
+        switch (expressionType) {
+            case EXP_PLUS_TERM:
+                return expression.getValue() + term.getValue();
+            case EXP_MINUS_TERM:
+                return expression.getValue() - term.getValue();
+            case TERM:
+                return term.getValue();
+            default:
+            case INVALID:
+                throw new ExpressionFormatException("could not parse Expression");
+        }
     }
     
 }

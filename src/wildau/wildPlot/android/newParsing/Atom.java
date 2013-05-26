@@ -29,10 +29,10 @@ public class Atom {
                 return atomObject.getValue();
             case EXP_IN_BRACKETS:
                 return expression.getValue();
-//            case FUNCTION_X:
-//                break;
-//            case FUNCTION_X_Y:
-//                break;
+            case FUNCTION_X:
+                return expression.getValue();
+            case FUNCTION_X_Y:
+                return expression.getValue();
             case INVALID:
             default:
                 throw new ExpressionFormatException("cannot parse Atom object");

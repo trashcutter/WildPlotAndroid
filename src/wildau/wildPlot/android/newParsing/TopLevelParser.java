@@ -73,7 +73,11 @@ public class TopLevelParser implements Function2D, Function3D{
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        //TODO clone all parserRegister parser objects
+		HashMap<String, TopLevelParser> newParserRegister = new HashMap<String, TopLevelParser>();
+		for(String key : parserRegister.keySet()){
+			newParserRegister.put(key, (TopLevelParser)parserRegister.get(key).clone());
+		}
+		
         return new TopLevelParser(this.expressionString, this.parserRegister);
     }
 

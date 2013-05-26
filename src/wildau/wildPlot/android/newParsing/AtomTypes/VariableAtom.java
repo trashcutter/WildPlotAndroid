@@ -1,13 +1,13 @@
 package wildau.wildPlot.android.newParsing.AtomTypes;
 
-import wildau.wildPlot.android.newParsing.Factor;
+import wildau.wildPlot.android.newParsing.Atom;
 import wildau.wildPlot.android.newParsing.TopLevelParser;
 
 /**
  * Created by mig on 25.05.13.
  */
 public class VariableAtom implements IAtomType {
-    private Factor.FactorType factorType = Factor.FactorType.NUMBER;
+    private Atom.AtomType factorType = Atom.AtomType.NUMBER;
     private TopLevelParser parser;
     private String varName;
 

@@ -1,17 +1,20 @@
 package wildau.wildPlot.android.newParsing;
 
-import wildau.wildPlot.android.newParsing.AtomTypes.IAtomType;
 
-public class Factor {
+
+public class Factor implements TreeElement{
     private TopLevelParser parser;
-    public static enum FactorType { PLUS_FACTOR, MINUS_FACTOR, POW, INVALID};
+    public static enum FactorType { PLUS_FACTOR, MINUS_FACTOR, POW, INVALID}
     private FactorType factorType = FactorType.INVALID;
     private Factor factor;
     private Pow pow;
     
     public Factor(String factorString, TopLevelParser parser){
         this.parser = parser;
-
+        if(!TopLevelParser.stringHasValidBrackets(factorString)){
+            this.factorType = FactorType.INVALID;
+            return;
+        }
         boolean isReady;
 
         isReady = initAsPlusFactor(factorString);
@@ -24,7 +27,7 @@ public class Factor {
     }
 
     private boolean initAsPlusFactor(String factorString){
-        if(factorString.charAt(0) == '+'){
+        if(factorString.length() > 0 && factorString.charAt(0) == '+'){
             boolean isValidFactor;
             String leftSubString = factorString.substring(1, factorString.length());
             Factor leftFactor = new Factor(leftSubString, parser);
@@ -40,7 +43,7 @@ public class Factor {
     }
 
     private boolean initAsMinusFactor(String factorString){
-        if(factorString.charAt(0) == '-'){
+        if(factorString.length() > 0 && factorString.charAt(0) == '-'){
             boolean isValidFactor;
             String leftSubString = factorString.substring(1, factorString.length());
             Factor leftFactor = new Factor(leftSubString, parser);
@@ -70,7 +73,7 @@ public class Factor {
         return factorType;
     }
 
-    public double getValue(){
+    public double getValue() throws ExpressionFormatException{
         switch (factorType) {
             case PLUS_FACTOR:
                 return factor.getValue();
@@ -84,7 +87,20 @@ public class Factor {
         }
 
     }
-    
-    
-    
+
+    @Override
+    public boolean isVariable() throws ExpressionFormatException{
+        switch (factorType) {
+            case PLUS_FACTOR:
+            case MINUS_FACTOR:
+                return factor.isVariable();
+            case POW:
+                return pow.isVariable();
+            case INVALID:
+            default:
+                throw new ExpressionFormatException("cannot parse expression at factor level");
+        }
+    }
+
+
 }

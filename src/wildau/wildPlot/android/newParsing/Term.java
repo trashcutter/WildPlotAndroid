@@ -2,7 +2,7 @@ package wildau.wildPlot.android.newParsing;
 
 
 
-public class Term {
+public class Term implements TreeElement{
     private TopLevelParser parser;
     public static enum TermType { TERM_MUL_FACTOR, TERM_DIV_FACTOR, FACTOR, INVALID};
     private TermType termType = TermType.INVALID;
@@ -12,64 +12,52 @@ public class Term {
     
     public Term(String termString, TopLevelParser parser){
         this.parser = parser;
+
+        if(!TopLevelParser.stringHasValidBrackets(termString)){
+            this.termType = TermType.INVALID;
+            return;
+        }
+
         boolean isReady = false;
 
-        isReady = initAsTermMulFactor(termString);
-        if(!isReady)
-            isReady = initAsTermDivFactor(termString);
+        isReady = initAsTermMulOrDivFactor(termString);
         if(!isReady)
             isReady = initAsFactor(termString);
         if(!isReady)
             this.termType = TermType.INVALID;
     }
     
-    private boolean initAsTermMulFactor(String termString){
+    private boolean initAsTermMulOrDivFactor(String termString){
+        int bracketChecker = 0;
         for(int i = 0; i< termString.length(); i++){
-            if(termString.charAt(i) == '*'){
-                boolean isValidFirstPartTerm = false;
-                String leftSubString = termString.substring(0, i);
-                Term leftTerm = new Term(leftSubString, parser);
-                isValidFirstPartTerm = leftTerm.getTermType() != TermType.INVALID;
-                
-                if(!isValidFirstPartTerm)
-                    continue;
-                
-                boolean isValidSecondPartFactor = false;
-                String rightSubString = termString.substring(i+1, termString.length());
-                Factor rightFactor = new Factor(rightSubString, parser);
-                isValidSecondPartFactor = rightFactor.getFactorType() != Factor.FactorType.INVALID;
-                
-                if(isValidSecondPartFactor){
-                    this.termType = TermType.TERM_MUL_FACTOR;
-                    this.term=leftTerm;
-                    this.factor=rightFactor;
-                    return true;
-                }
-                
+            if(termString.charAt(i) == '('){
+                bracketChecker++;
             }
-        }
-        
-        return false;
-    }
-    
-    private boolean initAsTermDivFactor(String termString){
-        for(int i = 0; i< termString.length(); i++){
-            if(termString.charAt(i) == '/'){
-                boolean isValidFirstPartTerm = false;
+            if(termString.charAt(i) == ')'){
+                bracketChecker--;
+            }
+            if((termString.charAt(i) == '*' || termString.charAt(i) == '/') && bracketChecker == 0){
                 String leftSubString = termString.substring(0, i);
+                if(!TopLevelParser.stringHasValidBrackets(leftSubString))
+                    continue;
                 Term leftTerm = new Term(leftSubString, parser);
-                isValidFirstPartTerm = leftTerm.getTermType() != TermType.INVALID;
+                boolean isValidFirstPartTerm = leftTerm.getTermType() != TermType.INVALID;
                 
                 if(!isValidFirstPartTerm)
                     continue;
                 
                 boolean isValidSecondPartFactor = false;
                 String rightSubString = termString.substring(i+1, termString.length());
+                if(!TopLevelParser.stringHasValidBrackets(rightSubString))
+                    continue;
                 Factor rightFactor = new Factor(rightSubString, parser);
                 isValidSecondPartFactor = rightFactor.getFactorType() != Factor.FactorType.INVALID;
                 
                 if(isValidSecondPartFactor){
-                    this.termType = TermType.TERM_DIV_FACTOR;
+                    if(termString.charAt(i) == '*')
+                        this.termType = TermType.TERM_MUL_FACTOR;
+                    else
+                        this.termType = TermType.TERM_DIV_FACTOR;
                     this.term=leftTerm;
                     this.factor=rightFactor;
                     return true;
@@ -109,6 +97,20 @@ public class Term {
                 throw new ExpressionFormatException("could not parse Term");
         }
     }
-    
-    
+
+    @Override
+    public boolean isVariable() {
+        switch (termType) {
+            case TERM_MUL_FACTOR:
+            case TERM_DIV_FACTOR:
+                return  term.isVariable() || factor.isVariable();
+            case FACTOR:
+                return factor.isVariable();
+            case INVALID:
+            default:
+                throw new ExpressionFormatException("could not parse Term");
+        }
+    }
+
+
 }

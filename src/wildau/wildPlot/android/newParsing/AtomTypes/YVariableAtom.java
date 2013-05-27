@@ -5,26 +5,16 @@ import wildau.wildPlot.android.newParsing.ExpressionFormatException;
 import wildau.wildPlot.android.newParsing.TopLevelParser;
 import wildau.wildPlot.android.newParsing.TreeElement;
 
-import java.util.regex.Pattern;
-
 /**
  * @author Michael Goldbach
  *
  */
-public class VariableAtom implements TreeElement {
-    //Todo register VarName in TopLevelParser
-    private Atom.AtomType atomType = Atom.AtomType.NUMBER;
+public class YVariableAtom implements TreeElement {
+    private Atom.AtomType atomType = Atom.AtomType.VARIABLE;
     private TopLevelParser parser;
-    private String varName;
 
-    public VariableAtom(String factorString, TopLevelParser parser){
+    public YVariableAtom(TopLevelParser parser){
         this.parser = parser;
-        this.varName = factorString;
-        Pattern p = Pattern.compile("[^a-zA-Z0-9]");
-        boolean hasSpecialChar = p.matcher(varName).find();
-        if(hasSpecialChar || !(varName.length() > 0)){
-            this.atomType = Atom.AtomType.INVALID;
-        }
     }
 
     public Atom.AtomType getAtomType() {
@@ -36,7 +26,7 @@ public class VariableAtom implements TreeElement {
 
         if (atomType != Atom.AtomType.INVALID){
 
-            return parser.getVarVal(varName);
+            return parser.getY();
         }
         else
             throw new ExpressionFormatException("Number is Invalid, cannot parse");

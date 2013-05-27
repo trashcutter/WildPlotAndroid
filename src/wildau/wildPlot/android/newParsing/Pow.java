@@ -3,7 +3,7 @@ package wildau.wildPlot.android.newParsing;
 /**
  * Created by mig on 25.05.13.
  */
-public class Pow {
+public class Pow implements TreeElement{
     private TopLevelParser parser;
     public static enum PowType {ATOM, ATOM_POW_FACTOR, ATOM_SQRT_FACTOR, INVALID};
     private PowType powType = PowType.INVALID;
@@ -12,7 +12,10 @@ public class Pow {
 
     public Pow(String powString, TopLevelParser parser){
         this.parser = parser;
-
+        if(!TopLevelParser.stringHasValidBrackets(powString)){
+            this.powType = PowType.INVALID;
+            return;
+        }
         boolean isReady;
 
         isReady = initAsAtom(powString);
@@ -36,9 +39,11 @@ public class Pow {
     }
     private boolean initAsAtomPowFactor(String powString){
         int opPos = powString.indexOf("^");
-        if(opPos > 1){
+        if(opPos > 0){
             String leftAtomString = powString.substring(0,opPos);
             String rightFactorString = powString.substring(opPos+1, powString.length());
+            if(!TopLevelParser.stringHasValidBrackets(leftAtomString) || !TopLevelParser.stringHasValidBrackets(rightFactorString))
+                return false;
             Atom leftAtom = new Atom(leftAtomString, parser);
             boolean isValidAtom = leftAtom.getAtomType() != Atom.AtomType.INVALID;
             if(isValidAtom){
@@ -58,9 +63,11 @@ public class Pow {
 
     private boolean initAsAtomSqrtFactor(String powString){
         int opPos = powString.indexOf("**");
-        if(opPos > 1){
+        if(opPos > 0){
             String leftAtomString = powString.substring(0,opPos);
-            String rightFactorString = powString.substring(opPos+1, powString.length());
+            String rightFactorString = powString.substring(opPos+2, powString.length());
+            if(!TopLevelParser.stringHasValidBrackets(leftAtomString) || !TopLevelParser.stringHasValidBrackets(rightFactorString))
+                return false;
             Atom leftAtom = new Atom(leftAtomString, parser);
             boolean isValidAtom = leftAtom.getAtomType() != Atom.AtomType.INVALID;
             if(isValidAtom){
@@ -78,14 +85,29 @@ public class Pow {
         return false;
     }
 
-    public double getValue(){
+    @Override
+    public double getValue() throws ExpressionFormatException{
         switch (powType) {
             case ATOM:
                 return atom.getValue();
             case ATOM_POW_FACTOR:
                 return Math.pow(atom.getValue(), factor.getValue());
             case ATOM_SQRT_FACTOR:
-                Math.sqrt(factor.getValue());
+                return Math.pow(atom.getValue(), 1.0/factor.getValue());
+            case INVALID:
+            default:
+                throw new ExpressionFormatException("cannot parse Atom expression");
+        }
+    }
+
+    @Override
+    public boolean isVariable() throws ExpressionFormatException{
+        switch (powType) {
+            case ATOM:
+                return atom.isVariable();
+            case ATOM_POW_FACTOR:
+            case ATOM_SQRT_FACTOR:
+                return atom.isVariable() || factor.isVariable();
             case INVALID:
             default:
                 throw new ExpressionFormatException("cannot parse Atom expression");

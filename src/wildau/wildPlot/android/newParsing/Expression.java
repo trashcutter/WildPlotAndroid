@@ -1,23 +1,22 @@
 package wildau.wildPlot.android.newParsing;
 
 
-public class Expression {
+public class Expression implements TreeElement{
     private TopLevelParser parser;
-    public static enum ExpressionType { EXP_PLUS_TERM, EXP_MINUS_TERM, TERM, INVALID};
+    public static enum ExpressionType { EXP_PLUS_TERM, EXP_MINUS_TERM, TERM, INVALID}
     private ExpressionType expressionType = ExpressionType.INVALID;
     private Expression expression = null;
     private Term term = null;
-    private Factor xVariableFactor = null;
-    private Factor yVariableFactor = null;
-    
+
     
     public Expression(String expressionString, TopLevelParser parser){
         this.parser = parser;
-        boolean isReady = false;
-        
-        isReady = initAsExpPlusTerm(expressionString);
-        if(!isReady)
-            isReady = initAsExpMinusTerm(expressionString);
+        if(!TopLevelParser.stringHasValidBrackets(expressionString)){
+            this.expressionType = ExpressionType.INVALID;
+            return;
+        }
+
+        boolean isReady = initAsExpPlusOrMinusTerm(expressionString);
         if(!isReady)
             isReady = initAsTerm(expressionString);
         if(!isReady)
@@ -25,24 +24,40 @@ public class Expression {
         
     }
     
-    private boolean initAsExpPlusTerm(String expressionString){
+    private boolean initAsExpPlusOrMinusTerm(String expressionString){
+        int bracketChecker = 0;
         for(int i = 0; i< expressionString.length(); i++){
-            if(expressionString.charAt(i) == '+'){
-                boolean isValidFirstPartExpression = false;
+            if(expressionString.charAt(i) == '('){
+                bracketChecker++;
+            }
+            if(expressionString.charAt(i) == ')'){
+                bracketChecker--;
+            }
+
+            if((expressionString.charAt(i) == '+' || expressionString.charAt(i) == '-') && bracketChecker == 0){
                 String leftSubString = expressionString.substring(0, i);
+                if(!TopLevelParser.stringHasValidBrackets(leftSubString))
+                    continue;
                 Expression leftExpression = new Expression(leftSubString, parser);
-                isValidFirstPartExpression = leftExpression.getExpressionType() != ExpressionType.INVALID;
+                boolean isValidFirstPartExpression = leftExpression.getExpressionType() != ExpressionType.INVALID;
                 
                 if(!isValidFirstPartExpression)
                     continue;
-                
-                boolean isValidSecondPartTerm = false;
+
                 String rightSubString = expressionString.substring(i+1, expressionString.length());
+                if(!TopLevelParser.stringHasValidBrackets(rightSubString))
+                    continue;
+
                 Term rightTerm = new Term(rightSubString, parser);
-                isValidSecondPartTerm = rightTerm.getTermType() != Term.TermType.INVALID;
+                boolean isValidSecondPartTerm = rightTerm.getTermType() != Term.TermType.INVALID;
                 
                 if(isValidSecondPartTerm){
-                    this.expressionType = ExpressionType.EXP_PLUS_TERM;
+                    if(expressionString.charAt(i) == '+'){
+                        this.expressionType = ExpressionType.EXP_PLUS_TERM;
+                    } else {
+                        this.expressionType = ExpressionType.EXP_MINUS_TERM;
+                    }
+
                     this.expression=leftExpression;
                     this.term=rightTerm;
                     return true;
@@ -52,35 +67,10 @@ public class Expression {
         }
         return false;
     }
-    private boolean initAsExpMinusTerm(String expressionString){
-        for(int i = 0; i< expressionString.length(); i++){
-            if(expressionString.charAt(i) == '-'){
-                boolean isValidFirstPartExpression = false;
-                String leftSubString = expressionString.substring(0, i);
-                Expression leftExpression = new Expression(leftSubString, parser);
-                isValidFirstPartExpression = leftExpression.getExpressionType() != ExpressionType.INVALID;
-                
-                if(!isValidFirstPartExpression)
-                    continue;
-                
-                boolean isValidSecondPartTerm = false;
-                String rightSubString = expressionString.substring(i+1, expressionString.length());
-                Term rightTerm = new Term(rightSubString, parser);
-                isValidSecondPartTerm = rightTerm.getTermType() != Term.TermType.INVALID;
-                
-                if(isValidSecondPartTerm){
-                    this.expressionType = ExpressionType.EXP_MINUS_TERM;
-                    this.expression=leftExpression;
-                    this.term=rightTerm;
-                    return true;
-                }
-                
-            }
-        }
-        return false;
-    }
-    
+
     private boolean initAsTerm(String expressionString){
+        if(!TopLevelParser.stringHasValidBrackets(expressionString))
+            return false;
         Term term = new Term(expressionString, parser);
         boolean isValidTerm = term.getTermType() != Term.TermType.INVALID;
         if(isValidTerm){
@@ -109,5 +99,19 @@ public class Expression {
                 throw new ExpressionFormatException("could not parse Expression");
         }
     }
-    
+
+    @Override
+    public boolean isVariable() {
+        switch (expressionType) {
+            case EXP_PLUS_TERM:
+            case EXP_MINUS_TERM:
+                return expression.isVariable() || term.isVariable();
+            case TERM:
+                return term.isVariable();
+            default:
+            case INVALID:
+                throw new ExpressionFormatException("could not parse Expression");
+        }
+    }
+
 }

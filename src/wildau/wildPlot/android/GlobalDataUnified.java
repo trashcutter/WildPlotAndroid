@@ -9,6 +9,7 @@ import wildau.wildPlot.android.densityFunctions.ASH;
 import wildau.wildPlot.android.densityFunctions.Density2D;
 import wildau.wildPlot.android.densityFunctions.KDE;
 import wildau.wildPlot.android.kernelFunctions.*;
+import wildau.wildPlot.android.newParsing.TopLevelParser;
 import wildau.wildPlot.android.parsing.FunctionParser;
 import wildau.wildPlot.android.parsing.SplineInterpolation;
 import wildau.wildPlot.android.regressionFunctions.LinearRegression;
@@ -62,6 +63,8 @@ public class GlobalDataUnified extends Application {
 	
 	private boolean updated 								= false;
 	private Vector<Function2D> func2DVector 				= new Vector<Function2D>();
+    private Vector<String> funcExpressionVector			    = new Vector<String>();
+    private Vector<String> funcExpression3DVector			= new Vector<String>();
 	private Vector<double[][]> linesPointVector 			= new Vector<double[][]>();
 	private Vector<double[][]> linesVector 					= new Vector<double[][]>();
 	private HashMap<Object, String> NameList 				= new HashMap<Object, String>();
@@ -130,7 +133,8 @@ public class GlobalDataUnified extends Application {
 		colorDef 				= new HashMap<Object, Color>();
 		pointVector 			= new Vector<double[][]>();
 		isSpline				= new HashMap<double[][], Boolean>();
-
+        funcExpressionVector	= new Vector<String>();
+        funcExpression3DVector	= new Vector<String>();
 		colorCnt = 1;
 		
 

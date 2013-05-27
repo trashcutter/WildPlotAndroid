@@ -3,6 +3,8 @@ package wildau.wildPlot.android;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +14,12 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-public class Settings extends Fragment {
+public class Settings extends Fragment implements View.OnClickListener, TextWatcher {
 
     public static final String FRAGMENT_NAME = "settings_fragment";
     GlobalDataUnified gs;
 	private boolean viewIsCreated = false;
+    private boolean onUpdate = true;
 
 	@Override
 	public void onResume(){
@@ -26,6 +29,11 @@ public class Settings extends Fragment {
 	
 	public void updateButtonStates(){
 	    View rootView = getView();
+        updateButtonStates(rootView);
+	}
+
+    private void updateButtonStates(View rootView){
+        onUpdate = true;
         final EditText leftX = (EditText) rootView.findViewById(R.id.leftXRange);
         final EditText rightX = (EditText) rootView.findViewById(R.id.rightXRange);
         final EditText leftY = (EditText) rootView.findViewById(R.id.leftYRange);
@@ -33,28 +41,30 @@ public class Settings extends Fragment {
 
         CheckBox checkBox = (CheckBox) rootView.findViewById(R.id.framedCheckBox);
         checkBox.setChecked(gs.isHasFrame());
-        
+
         checkBox = (CheckBox) rootView.findViewById(R.id.gridCheckBox);
         checkBox.setChecked(gs.isHasGrid());
-        
+
         checkBox = (CheckBox) rootView.findViewById(R.id.logXCheckBox);
         checkBox.setChecked(gs.isLogX());
-        
+
         checkBox = (CheckBox) rootView.findViewById(R.id.logYCheckBox);
         checkBox.setChecked(gs.isLogY());
-        
+
         //System.err.println(gs.isLogY() + "!!!!");
-        
+
         leftX.setText(gs.getXstart()+"");
         rightX.setText(gs.getXend()+"");
         leftY.setText(gs.getYstart()+"");
         rightY.setText(gs.getYend()+"");
-
+        onUpdate = false;
         //checkBox.setChecked(gs.isHasFrame());
-	}
+    }
 
 	public void reset(View view){
-		gs.reset();
+        onUpdate = true;
+        System.err.println("reset request!!!!!!!!!!!!!!!!!!!!!");
+        gs.reset();
 		View rootView = getView();
 		final EditText leftX 	= (EditText) rootView.findViewById(R.id.leftXRange);
 		final EditText rightX 	= (EditText) rootView.findViewById(R.id.rightXRange);
@@ -77,6 +87,7 @@ public class Settings extends Fragment {
 		
 		checkBox = (CheckBox) rootView.findViewById(R.id.logYCheckBox);
 		checkBox.setChecked(gs.isLogY());
+        onUpdate = false;
 	}
 	public void onPause(){
 		super.onPause();
@@ -101,21 +112,47 @@ public class Settings extends Fragment {
 		
 		RadioGroup radio = (RadioGroup) rootView.findViewById(R.id.radioGroup2);
 		radio.check(R.id.radio0);
-		viewIsCreated = true;
+        setListeners(rootView);
+        updateButtonStates(rootView);
+        viewIsCreated = true;
 		return rootView;
 	}
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser) {
-	super.setUserVisibleHint(isVisibleToUser);
 
-	if (!isVisibleToUser) { 
-	    updateSettings();
-	}
+    private void setListeners(View rootView){
 
-	}
+        final EditText leftX = (EditText) rootView.findViewById(R.id.leftXRange);
+        final EditText rightX = (EditText) rootView.findViewById(R.id.rightXRange);
+        final EditText leftY = (EditText) rootView.findViewById(R.id.leftYRange);
+        final EditText rightY = (EditText) rootView.findViewById(R.id.RightYRange);
+
+        final CheckBox frameCheckBox = (CheckBox) rootView.findViewById(R.id.framedCheckBox);
+        final CheckBox gridCheckBox = (CheckBox) rootView.findViewById(R.id.gridCheckBox);
+
+        final CheckBox logXCheckBox = (CheckBox) rootView.findViewById(R.id.logXCheckBox);
+        final CheckBox logYCheckBox = (CheckBox) rootView.findViewById(R.id.logYCheckBox);
+
+        leftX.addTextChangedListener(this);
+        rightX.addTextChangedListener(this);
+        leftY.addTextChangedListener(this);
+        rightY.addTextChangedListener(this);
+        frameCheckBox.setOnClickListener(this);
+        gridCheckBox.setOnClickListener(this);
+        logXCheckBox.setOnClickListener(this);
+        logYCheckBox.setOnClickListener(this);
+    }
+
+//	@Override
+//	public void setUserVisibleHint(boolean isVisibleToUser) {
+//	super.setUserVisibleHint(isVisibleToUser);
+//
+//	if (!isVisibleToUser) {
+//	    updateSettings();
+//	}
+//
+//	}
 	public void updateSettings(){
-	    if(this.isHidden() || !this.isResumed()){
-	        System.err.println("hidden");
+	    if(this.isHidden() || !this.isResumed() || !this.viewIsCreated || onUpdate){
+	        //System.err.println("hidden");
 	        return;
 	        
 	    }
@@ -185,5 +222,25 @@ public class Settings extends Fragment {
 
     public boolean viewIsCreated() {
         return viewIsCreated;
+    }
+
+    @Override
+    public void onClick(View v) {
+        updateSettings();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        updateSettings();
     }
 }

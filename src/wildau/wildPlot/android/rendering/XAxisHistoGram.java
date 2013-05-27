@@ -42,6 +42,8 @@ public class XAxisHistoGram implements Drawable {
 	
 	private boolean filling = false;
 
+    private boolean isOnReset = false;
+
 	/**
 	 * @param plotSheet
 	 * @param points the points used for calculating histogram data
@@ -82,7 +84,7 @@ public class XAxisHistoGram implements Drawable {
 	 */
 	@Override
 	public void paint(Graphics g) {
-		
+        boolean isOnReset = false;
 		
 		Color oldColor = g.getColor();
 		Rectangle field = g.getClipBounds();
@@ -109,6 +111,8 @@ public class XAxisHistoGram implements Drawable {
 		tmp = (start - tmp*steps); 
 		
 		while(tmp <= plotSheet.getxRange()[1]) {
+            if (isOnReset)
+                return;
 			double sizeInRange = getSizeInRange(tmp, tmp+size);
 			if(sizeInRange != 0)
 				drawBar(tmp, sizeInRange*scaleFactor*extraScaleFactor, g, field);
@@ -260,7 +264,7 @@ public class XAxisHistoGram implements Drawable {
 
 	@Override
 	public void abortAndReset() {
-		// TODO Auto-generated method stub
+		this.isOnReset = true;
 		
 	}
     @Override

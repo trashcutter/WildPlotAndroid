@@ -11,6 +11,8 @@ import java.util.Vector;
 public class DrawableContainer implements Drawable {
     Vector<Drawable> drawableVector = new Vector<Drawable>();
     private boolean isOnFrame = false;
+    private boolean isOnAbort = false;
+    private Drawable currentDrawable = null;
 
     public DrawableContainer(boolean isOnFrame){
         this.isOnFrame = isOnFrame;
@@ -22,7 +24,12 @@ public class DrawableContainer implements Drawable {
 
     @Override
     public void paint(Graphics g) {
+        isOnAbort = false;
+        currentDrawable = null;
         for(Drawable drawable: drawableVector){
+            currentDrawable = drawable;
+            if(isOnAbort)
+                return;
             drawable.paint(g);
         }
     }
@@ -34,7 +41,9 @@ public class DrawableContainer implements Drawable {
 
     @Override
     public void abortAndReset() {
-
+        isOnAbort = true;
+        if(currentDrawable != null)
+            currentDrawable.abortAndReset();
     }
 
     @Override

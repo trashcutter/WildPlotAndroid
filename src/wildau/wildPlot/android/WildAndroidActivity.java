@@ -35,16 +35,17 @@ public class WildAndroidActivity extends FragmentActivity {
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setOnPageChangeListener(new OnPageChangeListener(){
 
+            //FIXME dirty code ahead:
             public void onPageSelected(int position) {
-                if(position==mSectionsPagerAdapter.getFragmentPostion(Plot.FRAGMENT_NAME)){
-                    int settingsFragmentPosition = mSectionsPagerAdapter.getFragmentPostion(Settings.FRAGMENT_NAME);
-                    Settings settings  = (Settings)mSectionsPagerAdapter.getItem(settingsFragmentPosition);
-                    if(settings != null && settings.viewIsCreated())
-                        settings.updateSettings();
-                }
+//                if(position==mSectionsPagerAdapter.getFragmentPostion(Plot.FRAGMENT_NAME)){
+//                    int settingsFragmentPosition = mSectionsPagerAdapter.getFragmentPostion(Settings.FRAGMENT_NAME);
+//                    Settings settings  = (Settings)getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+settingsFragmentPosition);
+//                    if(settings != null && settings.viewIsCreated())
+//                        settings.updateSettings();
+//                }
                 if(position==mSectionsPagerAdapter.getFragmentPostion(Settings.FRAGMENT_NAME)){
                     int settingsFragmentPosition = mSectionsPagerAdapter.getFragmentPostion(Settings.FRAGMENT_NAME);
-                    Settings settings  = (Settings)mSectionsPagerAdapter.getItem(settingsFragmentPosition);
+                    Settings settings  = (Settings)getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+settingsFragmentPosition);
                     if(settings != null)
                         settings.updateButtonStates();
                 }
@@ -53,13 +54,13 @@ public class WildAndroidActivity extends FragmentActivity {
             @Override
             public void onPageScrollStateChanged(int arg0) {
                 // TODO Auto-generated method stub
-                
+
             }
 
             @Override
             public void onPageScrolled(int arg0, float arg1, int arg2) {
                 // TODO Auto-generated method stub
-                
+
             }
 
         });
@@ -69,12 +70,12 @@ public class WildAndroidActivity extends FragmentActivity {
     }
     public void reset(View view){
         int settingsFragmentPosition = mSectionsPagerAdapter.getFragmentPostion(Settings.FRAGMENT_NAME);
-        Settings settings  = (Settings)mSectionsPagerAdapter.getItem(settingsFragmentPosition);
+        Settings settings  = (Settings)getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+settingsFragmentPosition);
         settings.reset(view);
     }
     public void buttonClick(View view) {
         int settingsFragmentPosition = mSectionsPagerAdapter.getFragmentPostion(Calc.FRAGMENT_NAME);
-        Calc calc  = (Calc)mSectionsPagerAdapter.getItem(settingsFragmentPosition);
+        Calc calc  = (Calc)getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+settingsFragmentPosition);
         calc.buttonClick(view);
     }
     public void odeClick(View view) {

@@ -62,6 +62,8 @@ public class FunctionDrawer_y implements Drawable {
 	 */
 	private Color color = new Color(255,0,0);
 
+    private boolean isOnReset = false;
+
     /**
 	 * Constructor for a FunctionDrawer object
 	 * @param function given function which is drawn
@@ -94,6 +96,7 @@ public class FunctionDrawer_y implements Drawable {
 	 */
 	@Override
 	public void paint(Graphics g) {
+        isOnReset = false;
 		if(function instanceof StepFunction2D) {
 			this.isStepFunction = true;
 		}
@@ -145,6 +148,9 @@ public class FunctionDrawer_y implements Drawable {
 		}
 		
 		for(int i = leftStart; i> rightEnd; i--) {
+            if(isOnReset)
+                return;
+
 			drawingPoint = plotSheet.toCoordinatePoint(0,i,field);
 			
 			coordEnd = coordStart;
@@ -241,7 +247,7 @@ public class FunctionDrawer_y implements Drawable {
 
 	@Override
 	public void abortAndReset() {
-		// TODO Auto-generated method stub
+        isOnReset = true;
 		
 	}
 

@@ -188,7 +188,7 @@ public class PlotView extends View implements Runnable
             if(globalData.isUpdated()){
                 plotSheet = globalData.getPlotSheet();
             }
-            System.gc();
+            //System.gc();
             plotCreatorThread = new Thread(plotSheet);
             plotSheet.setClip(field);
             plotCreatorThread.start();

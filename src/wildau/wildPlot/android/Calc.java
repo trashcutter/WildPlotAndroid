@@ -50,8 +50,10 @@ public class Calc extends Fragment {
 		} else if(text.toString().equals("=")) {
 			inputContainter.calc();
 		} else if(text.toString().equals("Plot")) {
-			inputContainter.plot();
-		} else {
+            inputContainter.plot();
+        }else if(text.toString().equals("Splot")) {
+            inputContainter.plot();
+        } else {
 			inputContainter.add(new CalcInput(text.toString()));
 		}
 		

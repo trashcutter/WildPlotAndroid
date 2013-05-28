@@ -24,6 +24,8 @@ import android.app.Application;
 public class GlobalDataUnified extends Application {
     public enum Kernel { Gaussian, Uniform, Cauchy, Cosine, Epanechnikov, Picard, Quartic, Triangular, Tricube, Triweight  };
 
+    private HashMap<String, TopLevelParser> parserRegister = new HashMap<String, TopLevelParser>();
+
     private Kernel kernel = Kernel.Gaussian;
 
 
@@ -64,7 +66,7 @@ public class GlobalDataUnified extends Application {
 	private boolean updated 								= false;
 	private Vector<Function2D> func2DVector 				= new Vector<Function2D>();
     private Vector<String> funcExpressionVector			    = new Vector<String>();
-    private Vector<String> funcExpression3DVector			= new Vector<String>();
+    private String funcExpression3D = null;
 	private Vector<double[][]> linesPointVector 			= new Vector<double[][]>();
 	private Vector<double[][]> linesVector 					= new Vector<double[][]>();
 	private HashMap<Object, String> NameList 				= new HashMap<Object, String>();
@@ -97,6 +99,9 @@ public class GlobalDataUnified extends Application {
 	private ArrayList<String> functionNames = new ArrayList<String>();
 	private boolean plotCommandIssued = false;
 
+    private int frameBorderPixelSize = 60;
+    private double func3DScaleOrder = 1;
+
 	
 	//this probably brings a lot of errors if new stuff is unregarded in this method
 	public void reset(){
@@ -116,8 +121,8 @@ public class GlobalDataUnified extends Application {
 		yMinorTicPixelDistance = 20;
 		xMinorTicPixelDistance = 20;
 		
-		xPointVector = new Vector<Double>();
-		yPointVector = new Vector<Double>();
+		xPointVector.removeAllElements();
+		yPointVector.removeAllElements();
 
 		arrayHasChanged = true;
 		
@@ -126,20 +131,20 @@ public class GlobalDataUnified extends Application {
 		touchPointType = 0; //0 = points, 1 = linespoints, 2 = spline
 		
 		updated 				= true;
-		func2DVector 			= new Vector<Function2D>();
-		linesPointVector 		= new Vector<double[][]>();
-		linesVector 			= new Vector<double[][]>();
-		NameList 				= new HashMap<Object, String>();
-		colorDef 				= new HashMap<Object, Color>();
-		pointVector 			= new Vector<double[][]>();
-		isSpline				= new HashMap<double[][], Boolean>();
-        funcExpressionVector	= new Vector<String>();
-        funcExpression3DVector	= new Vector<String>();
+		func2DVector.removeAllElements();
+		linesPointVector.removeAllElements();
+		linesVector.removeAllElements();
+		NameList.clear();
+		colorDef.clear();
+		pointVector.removeAllElements();
+		isSpline.clear();
+        funcExpressionVector.removeAllElements();
+        funcExpression3D = null;
 		colorCnt = 1;
 		
 
 		
-		paintables = new Vector<Drawable>();
+		paintables.removeAllElements();
 		
 		plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend);
 		hasFrame = false; 
@@ -150,7 +155,7 @@ public class GlobalDataUnified extends Application {
 		isAxisOnFrame= false;
 		
 		//parser = new FunctionParser();
-		functionNames = new ArrayList<String>();
+		functionNames.clear();
 		plotCommandIssued = false;
 	}
 	
@@ -184,6 +189,19 @@ public class GlobalDataUnified extends Application {
 		this.updated = true;
 		return true;
 	}
+
+    public boolean plotWithNewParser(String expression){
+        this.colorDef.put(expression, gradientColors[colorCnt++%(gradientColors.length)]);
+        this.funcExpressionVector.add(expression);
+        this.updated = true;
+        return true;
+    }
+
+    public boolean splotWithNewParser(String expression){
+        this.funcExpression3D = expression;
+        this.updated = true;
+        return true;
+    }
 	
 	public void tablePlot(double[][] points, String name, boolean isSpline) {
 		this.pointVector.add(points);
@@ -267,7 +285,7 @@ public class GlobalDataUnified extends Application {
 			this.yaxis.setLog();
 		}
 		if(hasFrame){
-			this.plotSheet.setFrameThickness(50);
+			this.plotSheet.setFrameThickness(frameBorderPixelSize);
 			if(this.isAxisOnFrame) {
 				xaxis.setOnFrame();
 				yaxis.setOnFrame();
@@ -306,6 +324,17 @@ public class GlobalDataUnified extends Application {
 			functionDrawer.setSize(lineThickness);
 			plotSheet.addDrawable(functionDrawer);
 		}
+
+        for(String expression: funcExpressionVector){
+            TopLevelParser func = new TopLevelParser(expression, parserRegister);
+            parserRegister.put(func.getFuncName(), func);
+            System.err.println(expression);
+            System.err.println(func.getFuncName() + "=" + func.f(1.0));
+
+            FunctionDrawer functionDrawer = new FunctionDrawer(func, plotSheet, colorDef.get(expression));
+            functionDrawer.setSize(lineThickness);
+            plotSheet.addDrawable(functionDrawer);
+        }
 		
 		
 		if(this.xPointVector.size() > 0){
@@ -365,8 +394,24 @@ public class GlobalDataUnified extends Application {
 				plotSheet.addDrawable(pointDrawer);
 				}
 		}
+
+        if(funcExpression3D != null) {
+            //set good parameters to use relief better
+            xaxis.setOnFrame();
+            yaxis.setOnFrame();
+            plotSheet.setFrameThickness(frameBorderPixelSize); //to be able to show legend
+            TopLevelParser func3D = new TopLevelParser(funcExpression3D, this.parserRegister);
+            parserRegister.put(func3D.getFuncName(), func3D);
+
+            ReliefDrawer reliefDrawer = new ReliefDrawer(func3DScaleOrder, 200, func3D, plotSheet, true);
+            reliefDrawer.setThreadCnt(3);
+            reliefDrawer.setPixelSkip(3);
+            plotSheet.addDrawable(reliefDrawer);
+            plotSheet.addDrawable(reliefDrawer.getLegend());
+        }
+
         double[][] pointsOfAssignment = touchPoints;
-        if (pointsOfAssignment != null && pointsOfAssignment[0].length > 0) {
+        if (pointsOfAssignment != null && pointsOfAssignment[0].length > 0 && funcExpression3D == null) {
             XAxisHistoGram histogramX = new XAxisHistoGram(plotSheet, pointsOfAssignment, this.originX,
                     this.widthX, Color.red);
             YAxisHistoGram histogramY = new YAxisHistoGram(plotSheet, pointsOfAssignment, this.originY,

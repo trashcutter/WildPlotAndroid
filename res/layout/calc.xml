@@ -262,7 +262,7 @@
         android:layout_above="@+id/Button20"
         android:layout_alignLeft="@+id/Button26"
         android:onClick="buttonClick"
-        android:text="&lt;-" />
+        android:text="Splot" />
 
     <Button
         android:id="@+id/Button29"

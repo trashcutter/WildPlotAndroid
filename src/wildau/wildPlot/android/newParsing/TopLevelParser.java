@@ -24,7 +24,7 @@ public class TopLevelParser implements Function2D, Function3D{
         this.expressionString = expressionString;
         boolean isValidExpressionString = initExpressionString();
 
-        this.expression =  new Expression(expressionString, this);
+        this.expression =  new Expression(this.expressionString, this);
         this.isValid = (expression.getExpressionType() != Expression.ExpressionType.INVALID) && isValidExpressionString;
 
     }

@@ -39,10 +39,17 @@ public class CalcInputContainer {
 	
 	public void plot() {
 	    System.err.println("CalcPlotTest: f"+ funcNr + "(x)=" + this.toString());
-		parser.parse("f"+ funcNr + "(x)=" + this.toString());
-		globalData.plot("f"+ funcNr++);
+
+		globalData.plotWithNewParser("f"+ funcNr + "(x)=" + this.toString());
 
 	}
+
+    public void splot() {
+        System.err.println("CalcPlotTest: f"+ funcNr + "(x)=" + this.toString());
+
+        globalData.splotWithNewParser("f"+ funcNr + "(x,y)=" + this.toString());
+
+    }
 	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();

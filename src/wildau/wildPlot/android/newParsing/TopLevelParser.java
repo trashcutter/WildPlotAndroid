@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-public class TopLevelParser implements Function2D, Function3D{
+public class TopLevelParser implements Function2D, Function3D, Cloneable{
     Random random = new Random();
     private HashMap<String, TopLevelParser> parserRegister;
     private HashMap<String, Double> varMap = new HashMap<String, Double>();
@@ -130,17 +130,17 @@ public class TopLevelParser implements Function2D, Function3D{
             throw new ExpressionFormatException("illegal Expression, cannot parse and return value");
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
+
+    public TopLevelParser createCopy(){
 		HashMap<String, TopLevelParser> newParserRegister = new HashMap<String, TopLevelParser>();
 		for(String key : parserRegister.keySet()){
-			newParserRegister.put(key, parserRegister.get(key).clone(newParserRegister));
+			newParserRegister.put(key, parserRegister.get(key).createCopy(newParserRegister));
 		}
 		
         return newParserRegister.get(this.funcName);
     }
 
-    protected TopLevelParser clone(HashMap<String, TopLevelParser> newParserRegister){
+    public TopLevelParser createCopy(HashMap<String, TopLevelParser> newParserRegister){
         return new TopLevelParser(this.expressionString, newParserRegister);
     }
 

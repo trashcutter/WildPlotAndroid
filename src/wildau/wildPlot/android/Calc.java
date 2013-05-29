@@ -52,7 +52,7 @@ public class Calc extends Fragment {
 		} else if(text.toString().equals("Plot")) {
             inputContainter.plot();
         }else if(text.toString().equals("Splot")) {
-            inputContainter.plot();
+            inputContainter.splot();
         } else {
 			inputContainter.add(new CalcInput(text.toString()));
 		}

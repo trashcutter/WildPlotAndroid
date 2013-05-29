@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Vector;
 
+import wildau.wildPlot.android.newParsing.TopLevelParser;
 import wildau.wildPlot.android.rendering.graphics.wrapper.BufferedImage;
 import wildau.wildPlot.android.rendering.graphics.wrapper.Color;
 import wildau.wildPlot.android.rendering.graphics.wrapper.Graphics;
@@ -243,18 +244,18 @@ public class ReliefDrawer implements Drawable {
 		
 		Graphics gnew = bimages[0].getGraphics();
 		gnew.setClip(field);
-		partRenderer[0] = new PartRenderer(gnew, field.x+plotSheet.getFrameThickness(), field.x + plotSheet.getFrameThickness()+ length/threadCnt);
+		partRenderer[0] = new PartRenderer(gnew, field.x+plotSheet.getFrameThickness(), field.x + plotSheet.getFrameThickness()+ length/threadCnt,function);
 		threads[0] = new Thread(partRenderer[0]);
 		for(int i = 1; i< threads.length-1; i++){
 			gnew = bimages[i].getGraphics();
 			gnew.setClip(field);
-			partRenderer[i] = new PartRenderer(gnew, field.x + plotSheet.getFrameThickness() + length*i/threadCnt +1, field.x+ plotSheet.getFrameThickness() + length*(i+1)/threadCnt);
+			partRenderer[i] = new PartRenderer(gnew, field.x + plotSheet.getFrameThickness() + length*i/threadCnt +1, field.x+ plotSheet.getFrameThickness() + length*(i+1)/threadCnt,function);
 			threads[i] = new Thread(partRenderer[i]);
 		}
 		if(threadCnt > 1){
 		gnew = bimages[threadCnt-1].getGraphics();
 		gnew.setClip(field);
-		partRenderer[threadCnt-1] = new PartRenderer(gnew, field.x + plotSheet.getFrameThickness() + length*(threadCnt-1)/threadCnt +1, field.x+ plotSheet.getFrameThickness() + length);
+		partRenderer[threadCnt-1] = new PartRenderer(gnew, field.x + plotSheet.getFrameThickness() + length*(threadCnt-1)/threadCnt +1, field.x+ plotSheet.getFrameThickness() + length,function);
 		threads[threadCnt-1] = new Thread(partRenderer[threadCnt-1]);
 		}
 		for(Thread thread : threads) {
@@ -591,12 +592,15 @@ public class ReliefDrawer implements Drawable {
 		Rectangle field = null;
 		int leftLim = 0;
 		int rightLim = 0;
+        Function3D function;
 
 		public DepthSearcher(Rectangle field, int leftLim, int rightLim) {
 			super();
 			this.field = field;
 			this.leftLim = leftLim;
 			this.rightLim = rightLim;
+            if(ReliefDrawer.this.function instanceof TopLevelParser)
+                function = ((TopLevelParser)ReliefDrawer.this.function).createCopy();
 		}
 
 
@@ -645,13 +649,17 @@ public class ReliefDrawer implements Drawable {
 		Rectangle field = null;
 		int leftLim = 0;
 		int rightLim = 0;
+        Function3D function;
 
-		public PartRenderer(Graphics g, int leftLim, int rightLim) {
+		public PartRenderer(Graphics g, int leftLim, int rightLim, Function3D function) {
 			super();
 			this.field = g.getClipBounds();
 			this.leftLim = leftLim;
 			this.rightLim = rightLim;
 			this.g = g;
+            if(function instanceof TopLevelParser)
+                function = ((TopLevelParser)function).createCopy();
+            this.function = function;
 		}
 
 

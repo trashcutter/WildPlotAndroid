@@ -396,6 +396,7 @@ public class GlobalDataUnified extends Application {
 		}
 
         if(funcExpression3D != null) {
+            System.out.println(funcExpression3D + "!!!!!!!!!");
             //set good parameters to use relief better
             xaxis.setOnFrame();
             yaxis.setOnFrame();

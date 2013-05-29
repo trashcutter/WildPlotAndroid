@@ -601,6 +601,7 @@ public class ReliefDrawer implements Drawable {
 			this.rightLim = rightLim;
             if(ReliefDrawer.this.function instanceof TopLevelParser)
                 function = ((TopLevelParser)ReliefDrawer.this.function).createCopy();
+            else function = ReliefDrawer.this.function;
 		}
 
 

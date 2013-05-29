@@ -169,11 +169,8 @@ public class FunctionDrawer implements Drawable {
 					f_x_old <= plotSheet.getyRange()[1] + overlap && f_x_old >= plotSheet.getyRange()[0] - overlap &&
 					f_x <= plotSheet.getyRange()[1] + overlap && f_x >= plotSheet.getyRange()[0] - overlap) {
 				
-				if(!this.isStepFunction){
-					g.drawLine(coordStart[0], coordStart[1], coordEnd[0], coordEnd[1]);
-				} else {
-					g.drawLine(coordStart[0], coordStart[1], coordStart[0], coordEnd[1]);
-				}
+				g.drawLine(coordStart[0], coordStart[1], coordEnd[0], coordEnd[1]);
+
 				
 			} else if(!warned) {
 				System.err.println("Could not draw part of function, possible pole or out of reach");

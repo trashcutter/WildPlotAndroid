@@ -45,15 +45,15 @@ public class Calc extends Fragment {
 		} else if(text.toString().equals("=")) {
 			inputContainter.calc();
 		} else if(text.toString().equals("Plot")) {
-            FunctionNameDialog dialog = new FunctionNameDialog();
-            dialog.show(getActivity().getSupportFragmentManager(), "NoticeDialogFragment");
+            FunctionNameDialog dialog = new FunctionNameDialog(inputContainter);
+            dialog.show(getActivity().getSupportFragmentManager(), "FunctionNameDialog");
             String funcName = dialog.getFunctionName();
 
-            System.err.println(funcName + "was choosen as a name");
-            if(funcName != null && funcName.length() > 0)
-                inputContainter.plot(funcName);
-            else
-                inputContainter.plot();
+//            System.err.println(funcName + "was choosen as a name");
+//            if(funcName != null && funcName.length() > 0)
+//                inputContainter.plot(funcName);
+//            else
+//                inputContainter.plot();
         }else if(text.toString().equals("Splot")) {
             inputContainter.splot();
         } else {

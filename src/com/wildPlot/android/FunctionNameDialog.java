@@ -10,10 +10,16 @@ import android.view.View;
 import android.widget.EditText;
 
 /**
- * Created by mig on 29.05.13.
+ * Created by Michael Goldbach
  */
-public class FunctionNameDialog extends DialogFragment{
+public class FunctionNameDialog extends DialogFragment implements View.OnClickListener{
     private String functionName = "";
+    private CalcInputContainer mInputContainter;
+
+    FunctionNameDialog(CalcInputContainer inputContainter){
+        mInputContainter = inputContainter;
+    }
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -27,6 +33,7 @@ public class FunctionNameDialog extends DialogFragment{
             @Override
             public void onClick(DialogInterface dialog, int id) {
                 functionName = textBox.getText().toString().trim();
+                mInputContainter.plot(functionName);
                 //FunctionNameDialog.this.getDialog().dismiss();
             }
         });
@@ -44,5 +51,10 @@ public class FunctionNameDialog extends DialogFragment{
 
     public String getFunctionName() {
         return functionName;
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }

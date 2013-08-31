@@ -41,7 +41,9 @@ public class Vec_d {
 
 	// utilities (helper functions)
 	private static void cpy(double a, double[] z) { for (int i = 0; i < z.length; i++) z[i] = a; }
-	private static void cpy(double[] x, double[] z) { for (int i = 0; i < z.length; i++) z[i] = x[i]; }
+	private static void cpy(double[] x, double[] z) {
+        System.arraycopy(x, 0, z, 0, z.length);
+    }
 	private static void inv(double[] x, double[] z) { for (int i = 0; i < z.length; i++) z[i] = -x[i]; }
 
 	private static void add(double a, double[] y, double[] z) { for (int i = 0; i < z.length; i++) z[i] = a + y[i]; }

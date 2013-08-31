@@ -43,8 +43,7 @@ public class Matrix_z
         this.v = new Complex[m][n];
         //System.out.println(this+"Es ist eine "+this.i+"x"+this.j+" Matrix");
         for (int k=0;k<m;k++)
-            for (int l=0;l<n;l++)
-                v[k][l]=C.v[k][l];
+            System.arraycopy(C.v[k], 0, v[k], 0, n);
     }
 
     public Matrix_z(int i, int j)
@@ -214,8 +213,7 @@ public class Matrix_z
             System.err.println("Länge stimmt nicht überein");
             System.exit(-1);
         }
-        for (int j=0; j<this.N(); j++)
-            v[i][j]=x.v[j];
+        System.arraycopy(x.v, 0, v[i], 0, this.N());
     }
 
     public void mulRow (int i, double n)
@@ -274,10 +272,7 @@ public class Matrix_z
     public Vector_z getCol(int k)
     {
         Complex[] a= new Complex[this.n];
-        for (int i=0; i<this.n; i++)
-        {
-            a[i]=this.v[k-1][i];
-        }
+        System.arraycopy(this.v[k - 1], 0, a, 0, this.n);
         return new Vector_z(a);
     }
 
@@ -349,10 +344,7 @@ public class Matrix_z
 
 		for (int i = 0; i < m; i++)
 		{
-			for (int j = 0; j < n; j++)
-			{
-				B.v[i][j] = v[i][j];	// left half
-			}
+            System.arraycopy(v[i], 0, B.v[i], 0, n);
 			B.v[i][i + n] = one;		// right half
 		}
 
@@ -406,10 +398,7 @@ public class Matrix_z
 		Matrix_z C = new Matrix_z(m, n);
 		for (int i = 0; i < m; i++)
 		{
-			for (int j = 0; j < n; j++)
-			{
-				C.v[i][j] = B.v[i][j + n];
-			}
+            System.arraycopy(B.v[i], 0 + n, C.v[i], 0, n);
 		}
 
 		// ... and we are done; return C as the inverse of this matrix

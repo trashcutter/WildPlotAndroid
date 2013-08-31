@@ -12,7 +12,7 @@
         android:id="@+id/resetButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/ash_update_points" android:onClick="updateAshKde"/>
+        android:text="@string/ash_update_points"/>
     
     <TextView
         android:id="@+id/textView3"

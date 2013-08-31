@@ -39,4 +39,5 @@
     <string name="ash_k_fold">K-Fold</string>
     <string name="ash_regression_m">M</string>
     <string name="ash_lambda">Lambda</string>
+    <string name="function_hint">f</string>
 </resources>

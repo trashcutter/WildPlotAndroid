@@ -153,10 +153,7 @@ public class Matrix_d
 		this.v = new double[m][n];
 		for (int i = 0; i < m; i++)
 		{
-			for (int j = 0; j < n; j++)
-			{
-				this.v[i][j] = a[i][j];
-			}
+            System.arraycopy(a[i], 0, this.v[i], 0, n);
 		}
 	}
 
@@ -413,10 +410,7 @@ public class Matrix_d
 
         for (int i = 0; i < m; i++)
         {
-            for (int j = 0; j < n; j++)
-            {
-                B.v[i][j] = v[i][j];	// left half
-            }
+            System.arraycopy(v[i], 0, B.v[i], 0, n);
             B.v[i][i + n] = 1.0;		// right half
         }
 
@@ -468,10 +462,7 @@ public class Matrix_d
         Matrix_d C = new Matrix_d(m, n);
         for (int i = 0; i < m; i++)
         {
-            for (int j = 0; j < n; j++)
-            {
-                C.v[i][j] = B.v[i][j + n];
-            }
+            System.arraycopy(B.v[i], 0 + n, C.v[i], 0, n);
         }
 
         // ... and we are done; return C as the inverse of this matrix

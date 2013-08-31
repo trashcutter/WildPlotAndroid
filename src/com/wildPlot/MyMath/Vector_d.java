@@ -31,7 +31,7 @@ public class Vector_d
     {
         this.n=a.length;
         this.v=new double[n];
-        for (int i=0; i<n; i++) v[i]=a[i];
+        System.arraycopy(a, 0, v, 0, n);
     }
     
     public Vector_d(Vec_d a)
@@ -45,7 +45,7 @@ public class Vector_d
     {
         this.n=a.n;
         this.v=new double[n];
-        for (int i=0; i<n; i++) v[i]=a.v[i];
+        System.arraycopy(a.v, 0, v, 0, n);
     }
 
     public static void checkLength(String type, int z, int x)

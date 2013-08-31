@@ -955,8 +955,6 @@ public class ODE {
 		}
 	}
 	public static void System_Array_Copy(double[] x, double[] y, int length){
-		for(int i=0; i<length; i++){
-			y[i]=x[i];
-		}
+        System.arraycopy(x, 0, y, 0, length);
 	}
 }

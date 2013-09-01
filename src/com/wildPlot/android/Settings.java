@@ -68,7 +68,18 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
 		final EditText rightX 	= (EditText) rootView.findViewById(R.id.rightXRange);
 		final EditText leftY 	= (EditText) rootView.findViewById(R.id.leftYRange);
 		final EditText rightY 	= (EditText) rootView.findViewById(R.id.RightYRange);
-		
+
+        final CheckBox histoActivateCheckBox = (CheckBox)rootView.findViewById(R.id.check_box_histo_activator);
+        histoActivateCheckBox.setChecked(gs.isKdeActivated());
+
+        final RadioButton pointsRadioButton = (RadioButton)rootView.findViewById(R.id.radio_settings_points);
+        final RadioButton linespointsRadioButton = (RadioButton)rootView.findViewById(R.id.radio_settings_linespoints);
+        final RadioButton splinesRadioButton = (RadioButton)rootView.findViewById(R.id.radio_settings_splines);
+
+        pointsRadioButton.setChecked(true);
+        linespointsRadioButton.setChecked(false);
+        splinesRadioButton.setChecked(false);
+
 		leftX.setText(gs.getXstart()+"");
 		rightX.setText(gs.getXend()+"");
 		leftY.setText(gs.getYstart()+"");
@@ -108,8 +119,8 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
 		//textBox.setText("Test:\n" + inputContainter.toString());
 		gs = (GlobalDataUnified) getActivity().getApplication();
 		
-		RadioGroup radio = (RadioGroup) rootView.findViewById(R.id.radioGroup2);
-		radio.check(R.id.radio0);
+		RadioGroup radio = (RadioGroup) rootView.findViewById(R.id.radio_group_point_settings);
+		radio.check(R.id.radio_settings_points);
         setListeners(rootView);
         updateButtonStates(rootView);
         viewIsCreated = true;
@@ -128,6 +139,10 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
 
         final CheckBox logXCheckBox = (CheckBox) rootView.findViewById(R.id.logXCheckBox);
         final CheckBox logYCheckBox = (CheckBox) rootView.findViewById(R.id.logYCheckBox);
+        final RadioButton pointsRadioButton = (RadioButton)rootView.findViewById(R.id.radio_settings_points);
+        final RadioButton linespointsRadioButton = (RadioButton)rootView.findViewById(R.id.radio_settings_linespoints);
+        final RadioButton splinesRadioButton = (RadioButton)rootView.findViewById(R.id.radio_settings_splines);
+        final CheckBox histoActivateCheckBox = (CheckBox)rootView.findViewById(R.id.check_box_histo_activator);
 
         leftX.addTextChangedListener(this);
         rightX.addTextChangedListener(this);
@@ -137,6 +152,10 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
         gridCheckBox.setOnClickListener(this);
         logXCheckBox.setOnClickListener(this);
         logYCheckBox.setOnClickListener(this);
+        pointsRadioButton.setOnClickListener(this);
+        linespointsRadioButton.setOnClickListener(this);
+        splinesRadioButton.setOnClickListener(this);
+        histoActivateCheckBox.setOnClickListener(this);
     }
 
 //	@Override
@@ -156,7 +175,7 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
 	    }
 	    System.err.println("unhidden");
 	    View rootView = getView();
-		RadioGroup radio = (RadioGroup) rootView.findViewById(R.id.radioGroup2);
+		RadioGroup radio = (RadioGroup) rootView.findViewById(R.id.radio_group_point_settings);
 
 		final EditText leftX = (EditText) rootView.findViewById(R.id.leftXRange);
 		final EditText rightX = (EditText) rootView.findViewById(R.id.rightXRange);
@@ -168,6 +187,13 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
 
 		final CheckBox logXCheckBox = (CheckBox) rootView.findViewById(R.id.logXCheckBox);
 		final CheckBox logYCheckBox = (CheckBox) rootView.findViewById(R.id.logYCheckBox);
+        final CheckBox histoActivateCheckBox = (CheckBox)rootView.findViewById(R.id.check_box_histo_activator);
+
+        if(histoActivateCheckBox.isChecked()){
+            gs.activateKde();
+        } else {
+            gs.deactivateKde();
+        }
 
 		gs.setXrange(Double.parseDouble(leftX.getText().toString() ), Double.parseDouble(rightX.getText().toString()));
 
@@ -192,15 +218,15 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
 		RadioButton radioButton = (RadioButton)radio.findViewById(selected);
 		if(selected != -1) {
 			//				System.err.println("!!!!!!Text of radioButton: " + radioButton.getText().toString());
-			if(radioButton.getText().toString().equals("points")) {
-				if(gs.getTouchPointType() != 0)
-					gs.setTouchPointType(0);
-			} else if(radioButton.getText().toString().equals("linespoints")) {
-				if(gs.getTouchPointType() != 1)
-					gs.setTouchPointType(1);
-			} else if(radioButton.getText().toString().equals("splines")) {
-				if(gs.getTouchPointType() != 2)
-					gs.setTouchPointType(2);
+			if(radioButton.getText().toString().equals(getString(R.string.points_radio_option))) {
+				if(gs.getTouchPointType() != GlobalDataUnified.TouchPointType.points)
+					gs.setTouchPointType(GlobalDataUnified.TouchPointType.points);
+			} else if(radioButton.getText().toString().equals(getString(R.string.linespoints_radio_option))) {
+				if(gs.getTouchPointType() != GlobalDataUnified.TouchPointType.linespoints)
+					gs.setTouchPointType(GlobalDataUnified.TouchPointType.linespoints);
+			} else if(radioButton.getText().toString().equals(getString(R.string.splines_radio_option))) {
+				if(gs.getTouchPointType() != GlobalDataUnified.TouchPointType.spline)
+					gs.setTouchPointType(GlobalDataUnified.TouchPointType.spline);
 			}
 		}
 

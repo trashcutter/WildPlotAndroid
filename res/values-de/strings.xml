@@ -27,4 +27,7 @@
     
     <string name="ode_number_steps">Schrittanzahl:</string>
     <string name="ode_start_integrator">Start ODE-Solver</string>
+    <string name="settings_kde_histo_topic">Histogram/ KDE Einstellungen</string>
+    <string name="settings_activate_histo_kde">aktivieren</string>
+    <string name="kde_settings_kernel">Kernel</string>
 </resources>

@@ -2,6 +2,7 @@ package com.wildPlot.android;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import android.util.Log;
 import com.wildPlot.android.rendering.*;
 import com.wildPlot.android.rendering.graphics.wrapper.*;
 
@@ -25,9 +26,10 @@ public class PlotView extends View implements Runnable
     private ScaleGestureDetector mScaleDetector;
     private float mScaleFactor = 1.f;
     private ReentrantLock finishedImageCheckLock = new ReentrantLock();
-    
+    private boolean isJustInitialized = false;
     
     private boolean finishedImageIsOnDisplay = false;
+    private boolean hasGlobalDataDelivered = false;
     Rect field = new Rect();
     private Thread plotCreatorThread = null;
     private int savedPlotWidth  = 0;
@@ -57,6 +59,7 @@ public class PlotView extends View implements Runnable
         mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 	public void setGlobalData(GlobalDataUnified globalData){
+        Log.i("WildPlot::PlotView", "in setGlobalData");
 	    this.globalData = globalData;
         this.plotSheet = globalData.getPlotSheet();
         setFocusable(true);
@@ -74,12 +77,13 @@ public class PlotView extends View implements Runnable
         Thread thread = new Thread(this);
         thread.start();
         this.thisView = this;
+        hasGlobalDataDelivered = true;
 	}
 
 	private void init()
 	{
 	    plotSheet = globalData.getPlotSheet();
-	    System.err.println("view: " + getHeight() +":" + getWidth());
+        Log.i("WildPlot::PlotView", "view: " + getHeight() +":" + getWidth());
 		bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.RGB_565);
 
 		bitmapCanvas = new Canvas(bitmap);
@@ -94,8 +98,9 @@ public class PlotView extends View implements Runnable
 		bitmapCanvas.drawColor(Color.WHITE);
 		
 		isInitialized = true;
+        isJustInitialized = true;
 //		initODE();
-		plotSheet = globalData.getPlotSheet();
+
 		
 	}
 
@@ -105,6 +110,19 @@ public class PlotView extends View implements Runnable
 	@Override
 	public void onDraw(Canvas canvas)
 	{
+
+        int cnt = 0;
+        while(!hasGlobalDataDelivered){
+            try {
+                Thread.sleep(50);
+                cnt++;
+                Log.w("WildPlot::PlotView", "waited " + cnt + " cycles for global data object");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
 	    canvas.drawColor(Color.WHITE);
 		if (!isInitialized)
 			init();
@@ -172,8 +190,8 @@ public class PlotView extends View implements Runnable
 	
 	private boolean checkAndProcessImageReconstruction(Rectangle field) throws InterruptedException{
 	    
-        boolean newConstructionOfPlotImageIsNecessary = (plotSheet.getPlotImage() == null && this.plotCreatorThread == null) ||  field.width != savedPlotWidth || field.height != savedPlotHeight || globalData.isUpdated();
-        
+        boolean newConstructionOfPlotImageIsNecessary = (plotSheet.getPlotImage() == null && this.plotCreatorThread == null) ||  field.width != savedPlotWidth || field.height != savedPlotHeight || globalData.isUpdated() || isJustInitialized;
+        isJustInitialized = false;
         
         if(newConstructionOfPlotImageIsNecessary){
             System.err.println("checkingimageReconstruction!!!");

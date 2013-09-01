@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
+import android.util.Log;
 import com.wildPlot.android.control.FunctionParserWrapper;
 import com.wildPlot.android.densityFunctions.ASH;
 import com.wildPlot.android.densityFunctions.Density2D;
@@ -26,7 +27,10 @@ public class GlobalDataUnified extends Application {
 
     private ReentrantLock mConfigLock = new ReentrantLock();
 
-    public enum Kernel { Gaussian, Uniform, Cauchy, Cosine, Epanechnikov, Picard, Quartic, Triangular, Tricube, Triweight  };
+    private boolean kdeIsActivated = false;
+
+    public enum Kernel { Gaussian, Uniform, Cauchy, Cosine, Epanechnikov, Picard, Quartic, Triangular, Tricube, Triweight  }
+    public enum TouchPointType {points, linespoints, spline}
 
     private HashMap<String, TopLevelParser> parserRegister = new HashMap<String, TopLevelParser>();
 
@@ -65,7 +69,7 @@ public class GlobalDataUnified extends Application {
 
 	private float lineThickness = 2;
 	
-	private int touchPointType = 0; //0 = points, 1 = linespoints, 2 = spline
+	private TouchPointType touchPointType = TouchPointType.points;
 	
 	private boolean updated 								= false;
 	private Vector<Function2D> func2DVector 				= new Vector<Function2D>();
@@ -104,7 +108,7 @@ public class GlobalDataUnified extends Application {
 	private boolean plotCommandIssued = false;
 
     private int frameBorderPixelSize = 80;
-    private double func3DScaleOrder = 1;
+    private double func3DScaleOrder = 0.9;
 
 	
 	//this probably brings a lot of errors if new stuff is unregarded in this method
@@ -133,7 +137,7 @@ public class GlobalDataUnified extends Application {
 		
 		lineThickness = 0.0f;
 		
-		touchPointType = 0; //0 = points, 1 = linespoints, 2 = spline
+		touchPointType = TouchPointType.points;
 		
 		updated 				= true;
 		func2DVector.removeAllElements();
@@ -162,6 +166,7 @@ public class GlobalDataUnified extends Application {
 		//parser = new FunctionParser();
 		functionNames.clear();
 		plotCommandIssued = false;
+        kdeIsActivated = false;
         mConfigLock.unlock();
 	}
 	
@@ -357,13 +362,14 @@ public class GlobalDataUnified extends Application {
 		
 		
 		if(this.xPointVector.size() > 0){
-			//draw hand drawn points
-			switch(this.touchPointType) {
-			case 0: PointDrawer2D pointDrawer = new PointDrawer2D(plotSheet, this.touchPoints, touchPointColor);
+            Log.i("WildPlot::GlobalDataUnified", "Plotting points on sheet. TouchPointType: " + touchPointType);
+            //draw hand drawn points
+			switch(touchPointType) {
+			case  points: PointDrawer2D pointDrawer = new PointDrawer2D(plotSheet, this.touchPoints, touchPointColor);
 			plotSheet.addDrawable(pointDrawer); break;
-			case 1: LinesPoints linesPoints = new LinesPoints(plotSheet, this.touchPoints, touchPointColor);
+			case linespoints: LinesPoints linesPoints = new LinesPoints(plotSheet, this.touchPoints, touchPointColor);
 			plotSheet.addDrawable(linesPoints); break;
-			case 2: 
+			case spline:
 				System.err.println("spline processing!");
 				for(int i = 0; i< touchPoints[0].length; i++)
 				    System.err.println("sp: " + touchPoints[0][i] + " : " + touchPoints[1][i]);
@@ -431,7 +437,7 @@ public class GlobalDataUnified extends Application {
         }
 
         double[][] pointsOfAssignment = touchPoints;
-        if (pointsOfAssignment != null && pointsOfAssignment[0].length > 0 && funcExpression3D == null) {
+        if (kdeIsActivated && pointsOfAssignment != null && pointsOfAssignment[0].length > 0 && funcExpression3D == null) {
             XAxisHistoGram histogramX = new XAxisHistoGram(plotSheet, pointsOfAssignment, this.originX,
                     this.widthX, Color.red);
             YAxisHistoGram histogramY = new YAxisHistoGram(plotSheet, pointsOfAssignment, this.originY,
@@ -639,11 +645,11 @@ public class GlobalDataUnified extends Application {
 		return hasFrame;
 	}
 
-	public int getTouchPointType() {
+	public TouchPointType getTouchPointType() {
 		return touchPointType;
 	}
 
-	public void setTouchPointType(int buttonType) {
+	public void setTouchPointType(TouchPointType buttonType) {
         mConfigLock.lock();
 		this.touchPointType = buttonType;
 		this.updated = true;
@@ -698,6 +704,23 @@ public class GlobalDataUnified extends Application {
 	public boolean isHasGrid() {
 		return hasGrid;
 	}
+
+    public void activateKde(){
+        mConfigLock.lock();
+        kdeIsActivated = true;
+        this.updated = true;
+        mConfigLock.unlock();
+    }
+    public void deactivateKde(){
+        mConfigLock.lock();
+        kdeIsActivated = false;
+        this.updated = true;
+        mConfigLock.unlock();
+    }
+
+    public boolean isKdeActivated(){
+        return kdeIsActivated;
+    }
     public void setOriginX(double originX) {
         mConfigLock.lock();
         this.originX = originX;

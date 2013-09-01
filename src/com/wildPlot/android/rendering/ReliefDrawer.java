@@ -72,6 +72,7 @@ public class ReliefDrawer implements Drawable {
 //			new Color(255, 88, 0),new Color(255, 39, 0), new Color(192, 19, 0), new Color(128, 0, 0) };
 	
 	private Color[] gradientColors = {Color.white, Color.GREEN.darker(), Color.GREEN.darker().darker(), Color.BLACK};
+    //private Color[] gradientColors = {Color.white, Color.BLACK};
 	
 	/**
 	 * The border function value between where borders are drawn. On colored plot each region between two borders gets

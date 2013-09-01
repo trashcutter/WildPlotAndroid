@@ -210,26 +210,26 @@
                 android:layout_weight="1" >
 
                 <RadioGroup
-                    android:id="@+id/radioGroup2"
+                    android:id="@+id/radio_group_point_settings"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
 
                     <RadioButton
-                        android:id="@+id/radio0"
+                        android:id="@+id/radio_settings_points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
                         android:text="@string/points_radio_option" />
 
                     <RadioButton
-                        android:id="@+id/radio1"
+                        android:id="@+id/radio_settings_linespoints"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/linespoints_radio_option" />
 
                     <RadioButton
-                        android:id="@+id/radio2"
+                        android:id="@+id/radio_settings_splines"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/splines_radio_option" />
@@ -237,6 +237,42 @@
                 </RadioGroup>
             </TableRow>
 
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRowTopicKDE"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/text_view_kde_topic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_kde_histo_topic"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        </TableRow>
+        <TableRow
+            android:id="@+id/table_row_histo_kde_activator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:baselineAligned="true" >
+
+            <TextView
+                android:id="@+id/text_view_kde_activator"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical|right"
+                android:text="@string/settings_activate_histo_kde"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <CheckBox
+                android:id="@+id/check_box_histo_activator"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_weight="2"
+                android:gravity="right" />
         </TableRow>
     </TableLayout>
 

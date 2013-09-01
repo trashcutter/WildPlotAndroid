@@ -40,4 +40,7 @@
     <string name="ash_regression_m">M</string>
     <string name="ash_lambda">Lambda</string>
     <string name="function_hint">f</string>
+    <string name="settings_kde_histo_topic">Histogram and KDE settings</string>
+    <string name="settings_activate_histo_kde">activate</string>
+    <string name="kde_settings_kernel">Kernel</string>
 </resources>

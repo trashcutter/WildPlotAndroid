@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="ash_update_points">update settings from points</string>
+    <string name="ash_update_points">optimize settings from points</string>
     <string name="ash_settings">Histogram settings</string>
     <string name="ash_width">width (x,y)</string>
     <string name="ash_origin">origin (x,y)</string>
@@ -43,4 +43,5 @@
     <string name="settings_kde_histo_topic">Histogram and KDE settings</string>
     <string name="settings_activate_histo_kde">activate</string>
     <string name="kde_settings_kernel">Kernel</string>
+    <string name="settings_setup_kde_button">setup</string>
 </resources>

@@ -30,4 +30,12 @@
     <string name="settings_kde_histo_topic">Histogram/ KDE Einstellungen</string>
     <string name="settings_activate_histo_kde">aktivieren</string>
     <string name="kde_settings_kernel">Kernel</string>
+    <string name="settings_setup_kde_button">setup</string>
+
+    <string name="ash_update_points">Optimiere mit Daten</string>
+    <string name="ash_settings">Histogramm Einstellungen</string>
+    <string name="ash_width">Breite (x,y)</string>
+    <string name="ash_origin">Ursprung (x,y)</string>
+    <string name="ash_m">M (x,y)</string>
+    <string name="ash_regression_settings">Regression settings</string>
 </resources>

@@ -7,10 +7,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
+import android.widget.*;
+
 
 public class Settings extends Fragment implements View.OnClickListener, TextWatcher {
 
@@ -123,6 +121,16 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
 		radio.check(R.id.radio_settings_points);
         setListeners(rootView);
         updateButtonStates(rootView);
+        final Button setupKdeButton = (Button) rootView.findViewById(R.id.button_setup_kde);
+        setupKdeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AshKdeSettingsDialog dialog = new AshKdeSettingsDialog(gs);
+                dialog.show(getActivity().getSupportFragmentManager(), "AshKdeSettingsDialog");
+            }
+        });
+
+
         viewIsCreated = true;
 		return rootView;
 	}

@@ -3,11 +3,8 @@ package com.wildPlot.android;
 import java.util.Vector;
 
 
-import com.wildPlot.system.HarmonicOscillator;
-import com.wildPlot.system.ODE;
+import com.wildPlot.system.*;
 import com.wildPlot.system.ODE.SOLVER;
-import com.wildPlot.system.ODE_FUN;
-import com.wildPlot.system.Vec_d;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -99,14 +96,14 @@ public class Ode extends Fragment {
             //				double ta = 0.0, tb = 50/(1.0*0.02);
             //				Vec_d xa = new Vec_d(new double[]{(8.0*0.06)/(2.0*2e3), (8.0*0.06)/(8e5) , (Math.pow(8.0*0.06, 2))/(2e3*1.0*0.02)});
 
-            ODE_FUN f = new HarmonicOscillator(1, 5);
+            //ODE_FUN f = new HarmonicOscillator(1, 5);
             double ta = 0.0, tb = 20.0;
             Vec_d xa = new Vec_d(new double[]{1.0,0.0});
 
 
             //	Example of a Lotka-Volterra System
             String name = "Oregonator";
-            //			ODE_FUN f = new LotkaVolterra(0.5, 0.25, 0.5, 0.1);name = "Lotka Volterra";
+            ODE_FUN f = new LotkaVolterra(0.5, 0.25, 0.5, 0.1);name = "Lotka Volterra";
             //			ODE_FUN f = new HarmonicOscillator(2*Math.PI, 2000);name = "Harmonic Oscillator";
             //			ODE_FUN f = new Oregonator();name = "Oregonator";
             //			double ta = 0.0, tb = 10.0;

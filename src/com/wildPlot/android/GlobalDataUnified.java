@@ -280,18 +280,17 @@ public class GlobalDataUnified extends Application {
 	
 	public void setXrange(double xstart, double xend) {
         mConfigLock.lock();
-		this.xstart = xstart;
-		this.xend = xend;
-		
+
+        this.xstart = (xstart<=xend)?  xstart :xend;
+        this.xend = (xstart<=xend)?  xend :xstart;
 		this.updated = true;
         mConfigLock.unlock();
 	}
 	
 	public void setYrange(double ystart, double yend) {
         mConfigLock.lock();
-		this.ystart = ystart;
-		this.yend = yend;
-		
+        this.ystart = (ystart<=yend)?  ystart :yend;
+        this.yend = (ystart<=yend)?  yend :ystart;
 		this.updated = true;
         mConfigLock.unlock();
 	}
@@ -728,6 +727,15 @@ public class GlobalDataUnified extends Application {
         mConfigLock.unlock();
     }
 
+    public double getOriginX(){
+        return originX;
+    }
+
+    public double getOriginY(){
+        return originY;
+    }
+
+
     public void setOriginY(double originY) {
         mConfigLock.lock();
         this.originY = originY;
@@ -742,11 +750,19 @@ public class GlobalDataUnified extends Application {
         mConfigLock.unlock();
     }
 
+    public double getWidthX(){
+        return widthX;
+    }
+
     public void setWidthY(double widthY) {
         mConfigLock.lock();
         this.widthY = widthY;
         this.updated = true;
         mConfigLock.unlock();
+    }
+
+    public double getWidthY(){
+        return widthY;
     }
 
     public void sethX(int hX) {
@@ -756,13 +772,19 @@ public class GlobalDataUnified extends Application {
         mConfigLock.unlock();
     }
 
+    public int gethX(){
+        return mX;
+    }
+
     public void sethY(int hY) {
         mConfigLock.lock();
         this.mY = hY;
         this.updated = true;
         mConfigLock.unlock();
     }
-
+    public int gethY(){
+        return mY;
+    }
     public double[][] getPointsOfAssignment() {
         updatePoints();
         return touchPoints;
@@ -773,6 +795,10 @@ public class GlobalDataUnified extends Application {
         this.kernel = kernel;
         this.updated = true;
         mConfigLock.unlock();
+    }
+
+    public Kernel getKernel(){
+        return kernel;
     }
 
     public void setLinearRegression(int m, double lambda){

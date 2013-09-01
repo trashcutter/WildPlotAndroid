@@ -9,7 +9,7 @@
         android:layout_height="wrap_content" >
 
         <Button
-        android:id="@+id/resetButton"
+        android:id="@+id/button_update_points"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/ash_update_points"/>
@@ -133,101 +133,7 @@
                 android:layout_weight="2"
                 android:gravity="center" />
         </TableRow>
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/ash_regression_settings"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-        <TableRow
-            android:id="@+id/tableRowKFold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
 
-            <TextView
-                android:id="@+id/textViewKFold"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right|center_vertical"
-                android:text="@string/ash_k_fold"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <EditText
-                android:id="@+id/editTextK"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:ems="10"
-                android:inputType="numberSigned|numberDecimal" />
-        </TableRow>
-
-		<TableRow
-            android:id="@+id/tableRowRegression"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/textViewRegression"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical|right"
-                android:text="@string/ash_regression_check_text"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <CheckBox
-                android:id="@+id/regressionCheckBox"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="2"
-                android:gravity="center" />
-        </TableRow>
-        <TableRow
-            android:id="@+id/tableRowRegressionM"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/textViewRegressionM"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right|center_vertical"
-                android:text="@string/ash_regression_m"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <EditText
-                android:id="@+id/editTextRegressionM"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:ems="10"
-                android:inputType="numberSigned|numberDecimal" />
-        </TableRow>
-        <TableRow
-            android:id="@+id/tableRowRegressionLambda"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/textViewRegressionLambda"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right|center_vertical"
-                android:text="@string/ash_lambda"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <EditText
-                android:id="@+id/editTextRegressionLambda"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:ems="10"
-                android:inputType="numberSigned|numberDecimal" />
-        </TableRow>
 		
 
     </TableLayout>

@@ -3,6 +3,7 @@ package com.wildPlot.android;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.wildPlot.android.control.FunctionParserWrapper;
 import com.wildPlot.android.densityFunctions.ASH;
@@ -22,6 +23,9 @@ import com.wildPlot.android.rendering.interfaces.*;
 import android.app.Application;
 
 public class GlobalDataUnified extends Application {
+
+    private ReentrantLock mConfigLock = new ReentrantLock();
+
     public enum Kernel { Gaussian, Uniform, Cauchy, Cosine, Epanechnikov, Picard, Quartic, Triangular, Tricube, Triweight  };
 
     private HashMap<String, TopLevelParser> parserRegister = new HashMap<String, TopLevelParser>();
@@ -99,12 +103,13 @@ public class GlobalDataUnified extends Application {
 	private ArrayList<String> functionNames = new ArrayList<String>();
 	private boolean plotCommandIssued = false;
 
-    private int frameBorderPixelSize = 60;
+    private int frameBorderPixelSize = 80;
     private double func3DScaleOrder = 1;
 
 	
 	//this probably brings a lot of errors if new stuff is unregarded in this method
 	public void reset(){
+        mConfigLock.lock();
 		xstart = -10;
 		xend = 10;
 		ystart = -10;
@@ -157,6 +162,7 @@ public class GlobalDataUnified extends Application {
 		//parser = new FunctionParser();
 		functionNames.clear();
 		plotCommandIssued = false;
+        mConfigLock.unlock();
 	}
 	
 	
@@ -165,9 +171,9 @@ public class GlobalDataUnified extends Application {
 	 * @param functionName name of the function needed for function parser
 	 * @return true if everything went OK, else false
 	 */
-	public boolean plot(String functionName) {
+	public void plot(String functionName) {
 		FunctionParserWrapper func = new FunctionParserWrapper(parser, functionName);
-		return plot(func, functionName+"(x)");
+		plot(func, functionName+"(x)");
 	}
 	
 	/**
@@ -176,39 +182,43 @@ public class GlobalDataUnified extends Application {
 	 * @param name name of function for legend
 	 * @return true if everything went OK, else false
 	 */
-	public boolean plot(Function2D func, String name) {
+	public void plot(Function2D func, String name) {
 		
 		//only set the limits, if they are not set by user directly because these 
 		//bounds given here are(or will be) calculated by the program parser
 
-
+        mConfigLock.lock();
 		//TODO: abrastern vorher (Dopplungen)
 		func2DVector.add(func);
 		NameList.put(func, name);
 		this.colorDef.put(func, gradientColors[colorCnt++%(gradientColors.length)]);
 		this.updated = true;
-		return true;
+        mConfigLock.unlock();
 	}
 
-    public boolean plotWithNewParser(String expression){
+    public void plotWithNewParser(String expression){
+        mConfigLock.lock();
         this.colorDef.put(expression, gradientColors[colorCnt++%(gradientColors.length)]);
         this.funcExpressionVector.add(expression);
         this.updated = true;
-        return true;
+        mConfigLock.unlock();
     }
 
-    public boolean splotWithNewParser(String expression){
+    public void splotWithNewParser(String expression){
+        mConfigLock.lock();
         this.funcExpression3D = expression;
         this.updated = true;
-        return true;
+        mConfigLock.unlock();
     }
 	
 	public void tablePlot(double[][] points, String name, boolean isSpline) {
+        mConfigLock.lock();
 		this.pointVector.add(points);
 		NameList.put(points, name);
 		this.isSpline.put(points, isSpline);
 		this.colorDef.put(points, gradientColors[colorCnt++%(gradientColors.length)]);
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	/**
@@ -217,10 +227,12 @@ public class GlobalDataUnified extends Application {
 	 * @param name for legend (not yet implemented)
 	 */
 	public void linesPoints(double[][] points, String name) {
+        mConfigLock.lock();
 		this.linesPointVector.add(points);
 		NameList.put(points, name);
 		this.colorDef.put(points, gradientColors[colorCnt++%(gradientColors.length)]);
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	/**
@@ -229,10 +241,12 @@ public class GlobalDataUnified extends Application {
 	 * @param name for legend (not yet implemented)
 	 */
 	public void lines(double[][] points, String name) {
+        mConfigLock.lock();
 		this.linesVector.add(points);
 		NameList.put(points, name);
 		this.colorDef.put(points, gradientColors[colorCnt++%(gradientColors.length)]);
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public FunctionParser getParser() {
@@ -260,20 +274,25 @@ public class GlobalDataUnified extends Application {
 	}
 	
 	public void setXrange(double xstart, double xend) {
+        mConfigLock.lock();
 		this.xstart = xstart;
 		this.xend = xend;
 		
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public void setYrange(double ystart, double yend) {
+        mConfigLock.lock();
 		this.ystart = ystart;
 		this.yend = yend;
 		
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	public AdvancedPlotSheet getPlotSheet() {
-		updatePoints();
+        mConfigLock.lock();
+        updatePoints();
 		this.plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend);
 		xaxis = new XAxis(plotSheet, 0, xTicPixelDistance, xMinorTicPixelDistance);
 		yaxis = new YAxis(plotSheet, 0, yTicPixelDistance, yMinorTicPixelDistance);
@@ -526,9 +545,11 @@ public class GlobalDataUnified extends Application {
 		plotSheet.addDrawable(yaxis);
 		
 		updated = false;
+        mConfigLock.unlock();
 		return plotSheet;
 	}
 
+    //no lock in this one, calling method must do the lock!
     private void updatePoints(){
         if(arrayHasChanged) {
             this.touchPoints = new double[2][xPointVector.size()];
@@ -545,40 +566,54 @@ public class GlobalDataUnified extends Application {
 	 * activate grid lines on plot
 	 */
 	public void setGrid() {
+        mConfigLock.lock();
 		this.hasGrid = true;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	/**
 	 * deactivate grid lines on plot (standard behavior)
 	 */
 	public void unsetGrid() {
+        mConfigLock.lock();
 		this.hasGrid = false;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	public void setFrame(){
+        mConfigLock.lock();
 		this.hasFrame = true;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public void unsetFrame(){
+        mConfigLock.lock();
 		this.hasFrame = false;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public void setAxisOnFrame() {
+        mConfigLock.lock();
 		this.isAxisOnFrame = true;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public void unsetAxisOnFrame() {
+        mConfigLock.lock();
 		this.isAxisOnFrame = false;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public void addPaintable(Drawable paint) {
+        mConfigLock.lock();
 		this.paintables.add(paint);
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	public boolean isUpdated() {
 		return updated;
@@ -609,35 +644,47 @@ public class GlobalDataUnified extends Application {
 	}
 
 	public void setTouchPointType(int buttonType) {
+        mConfigLock.lock();
 		this.touchPointType = buttonType;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public void addPointFromScreen(double x, double y){
-		this.xPointVector.add(x);
+		mConfigLock.lock();
+        this.xPointVector.add(x);
 		this.yPointVector.add(y);
 		this.arrayHasChanged = true;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public void setLogX() {
+        mConfigLock.lock();
 		this.isLogX = true;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 
 	public void setLogY() {
+        mConfigLock.lock();
 		this.isLogY = true;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 	
 	public void unsetLogX() {
+        mConfigLock.lock();
 		this.isLogX = false;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 
 	public void unsetLogY() {
+        mConfigLock.lock();
 		this.isLogY = false;
 		this.updated = true;
+        mConfigLock.unlock();
 	}
 
 	public boolean isLogX() {
@@ -652,33 +699,45 @@ public class GlobalDataUnified extends Application {
 		return hasGrid;
 	}
     public void setOriginX(double originX) {
+        mConfigLock.lock();
         this.originX = originX;
         this.updated = true;
+        mConfigLock.unlock();
     }
 
     public void setOriginY(double originY) {
+        mConfigLock.lock();
         this.originY = originY;
         this.updated = true;
+        mConfigLock.unlock();
     }
 
     public void setWidthX(double widthX) {
+        mConfigLock.lock();
         this.widthX = widthX;
         this.updated = true;
+        mConfigLock.unlock();
     }
 
     public void setWidthY(double widthY) {
+        mConfigLock.lock();
         this.widthY = widthY;
         this.updated = true;
+        mConfigLock.unlock();
     }
 
     public void sethX(int hX) {
+        mConfigLock.lock();
         this.mX = hX;
         this.updated = true;
+        mConfigLock.unlock();
     }
 
     public void sethY(int hY) {
+        mConfigLock.lock();
         this.mY = hY;
         this.updated = true;
+        mConfigLock.unlock();
     }
 
     public double[][] getPointsOfAssignment() {
@@ -687,14 +746,18 @@ public class GlobalDataUnified extends Application {
     }
 
     public void setKernel(Kernel kernel) {
+        mConfigLock.lock();
         this.kernel = kernel;
         this.updated = true;
+        mConfigLock.unlock();
     }
 
     public void setLinearRegression(int m, double lambda){
+        mConfigLock.lock();
         this.hasLinearRegression = true;
         this.m = m;
         this.lambda =  lambda;
         this.updated = true;
+        mConfigLock.unlock();
     }
 }

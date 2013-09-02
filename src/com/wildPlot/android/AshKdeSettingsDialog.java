@@ -51,7 +51,8 @@ public class AshKdeSettingsDialog extends DialogFragment implements View.OnClick
         final Spinner kernelSpinner = (Spinner) rootView.findViewById(R.id.spinner_kernel);
         kernelSpinner.setAdapter(new ArrayAdapter<GlobalDataUnified.Kernel>(getActivity(), android.R.layout.simple_spinner_item, GlobalDataUnified.Kernel.values()));
 
-        kernelSpinner.setSelection(0);
+
+        kernelSpinner.setSelection(mGlobalDataUnified.getKernel().ordinal());
 
 
 

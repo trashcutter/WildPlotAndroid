@@ -583,8 +583,13 @@ public class ReliefDrawer implements Drawable {
         public boolean isClusterable() {
             return false;
         }
-		
-	}
+
+        @Override
+        public boolean isCritical() {
+            return false;
+        }
+
+    }
 	private class DepthSearcher implements Runnable{
 
 		double f_xHighest = 0;
@@ -703,6 +708,11 @@ public class ReliefDrawer implements Drawable {
 
     @Override
     public boolean isClusterable() {
+        return false;
+    }
+
+    @Override
+    public boolean isCritical() {
         return false;
     }
 }

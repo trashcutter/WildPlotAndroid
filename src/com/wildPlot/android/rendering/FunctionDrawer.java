@@ -257,5 +257,10 @@ public class FunctionDrawer implements Drawable {
         return true;
     }
 
+    @Override
+    public boolean isCritical() {
+        return false;
+    }
+
 
 }

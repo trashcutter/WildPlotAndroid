@@ -424,4 +424,9 @@ public class XAxis implements Drawable {
         return true;
     }
 
+    @Override
+    public boolean isCritical() {
+        return true;
+    }
+
 }

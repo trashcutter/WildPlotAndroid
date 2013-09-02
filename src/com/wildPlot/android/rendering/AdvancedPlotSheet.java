@@ -94,11 +94,12 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 	 * @param yStart the start of the y-range
 	 * @param yEnd the end of the y-range
 	 */
-	public AdvancedPlotSheet(double xStart, double xEnd, double yStart, double yEnd) {
+	public AdvancedPlotSheet(double xStart, double xEnd, double yStart, double yEnd, BufferedImage plotImage) {
 		super(xStart, xEnd, yStart, yEnd);
 		double[] xRange = {xStart, xEnd};
 		double[] yRange = {yStart, yEnd};
 		screenParts.add(0, new MultiScreenPart(xRange, yRange));
+        this.plotImage = plotImage;
 		
 	}
 	
@@ -209,7 +210,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 			finished = true;
 			for(i=0; i<threads.length; i++ ){
 				DrawableDrawingRunnable currentDrawableRunnable = allDrawableDirectory.get(threads[i]);
-				if (currentDrawableRunnable.hasFinished()) {
+				if (currentDrawableRunnable.hasFinished() || currentDrawableRunnable.getIsCritical()) {
 					if(!currentDrawableRunnable.hasJoined()){
 						Drawable drawable = currentDrawableRunnable.getDrawable();
 						if(drawable instanceof ReliefDrawer){
@@ -295,25 +296,38 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
         Vector<Drawable> onFrameDrawables = new Vector<Drawable>();
         Vector<Drawable> offFrameDrawables = new Vector<Drawable>();
 
-        DrawableContainer onFrameContainer = new DrawableContainer(true);
-        DrawableContainer offFrameContainer = new DrawableContainer(false);
+        DrawableContainer onFrameContainer = new DrawableContainer(true, false);
+
+        DrawableContainer offFrameContainer = new DrawableContainer(false, false);
         for(Drawable drawable : drawables){
             if(drawable.isOnFrame()){
                 if(drawable.isClusterable()){
-                    onFrameContainer.addDrawable(drawable);
+                    if(onFrameContainer.isCritical() == drawable.isCritical()){
+                        onFrameContainer.addDrawable(drawable);
+                    }else {
+                        onFrameDrawables.add(onFrameContainer);
+                        onFrameContainer = new DrawableContainer(true, drawable.isCritical());
+                        onFrameContainer.addDrawable(drawable);
+                    }
                 }else{
                     onFrameDrawables.add(onFrameContainer);
                     onFrameDrawables.add(drawable);
-                    onFrameContainer = new DrawableContainer(true);
+                    onFrameContainer = new DrawableContainer(true, false);
 
                 }
             }else{
                 if(drawable.isClusterable()){
-                    offFrameContainer.addDrawable(drawable);
+                    if(offFrameContainer.isCritical() == drawable.isCritical()){
+                        offFrameContainer.addDrawable(drawable);
+                    } else {
+                        offFrameDrawables.add(offFrameContainer);
+                        offFrameContainer = new DrawableContainer(true, drawable.isCritical());
+                        offFrameContainer.addDrawable(drawable);
+                    }
                 }else{
                     offFrameDrawables.add(offFrameContainer);
                     offFrameDrawables.add(drawable);
-                    offFrameContainer = new DrawableContainer(false);
+                    offFrameContainer = new DrawableContainer(false, false);
                 }
             }
         }
@@ -746,7 +760,10 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		public void setBufferedOldDrawableImage(BufferedImage bufferedOldDrawableImage) {
 			this.bufferedOldDrawableImage = bufferedOldDrawableImage;
 		}
-		
+
+        public boolean getIsCritical(){
+            return drawable.isCritical();
+        }
 		
 		
 	}

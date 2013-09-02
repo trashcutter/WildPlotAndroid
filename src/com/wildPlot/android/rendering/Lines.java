@@ -85,4 +85,9 @@ public class Lines implements Drawable {
     public boolean isClusterable() {
         return true;
     }
+
+    @Override
+    public boolean isCritical() {
+        return false;
+    }
 }

@@ -562,4 +562,9 @@ public class PlotSheet implements Drawable {
     public boolean isClusterable() {
         return true;
     }
+
+    @Override
+    public boolean isCritical() {
+        return false;
+    }
 }

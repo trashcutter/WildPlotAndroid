@@ -12,8 +12,6 @@ import com.wildPlot.android.rendering.interfaces.Drawable;
 /**
  * This class simply draws points from a given data array or a function in given interval on a PlotSheet object
  * 
- * @see wildPlot.rendering.Drawable
- * @see wildPlot.rendering.PlotSheet
  */
 public class PointDrawer2D implements Drawable {
 	
@@ -75,6 +73,11 @@ public class PointDrawer2D implements Drawable {
 
     @Override
     public boolean isClusterable() {
+        return true;
+    }
+
+    @Override
+    public boolean isCritical() {
         return true;
     }
 }

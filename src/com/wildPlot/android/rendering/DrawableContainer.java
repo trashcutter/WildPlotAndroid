@@ -12,14 +12,17 @@ public class DrawableContainer implements Drawable {
     Vector<Drawable> drawableVector = new Vector<Drawable>();
     private boolean isOnFrame = false;
     private boolean isOnAbort = false;
+    private boolean isCritical = false;
     private Drawable currentDrawable = null;
 
-    public DrawableContainer(boolean isOnFrame){
+    public DrawableContainer(boolean isOnFrame, boolean isCritical){
         this.isOnFrame = isOnFrame;
+        this.isCritical = isCritical;
     }
 
     public void addDrawable(Drawable drawable){
         drawableVector.add(drawable);
+
     }
 
     @Override
@@ -49,5 +52,10 @@ public class DrawableContainer implements Drawable {
     @Override
     public boolean isClusterable() {
         return false;
+    }
+
+    @Override
+    public boolean isCritical() {
+        return isCritical;
     }
 }

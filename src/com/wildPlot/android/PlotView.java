@@ -61,7 +61,7 @@ public class PlotView extends View implements Runnable
 	public void setGlobalData(GlobalDataUnified globalData){
         Log.i("WildPlot::PlotView", "in setGlobalData");
 	    this.globalData = globalData;
-        this.plotSheet = globalData.getPlotSheet();
+        this.plotSheet = globalData.getPlotSheet(null);
         setFocusable(true);
         setFocusableInTouchMode(true);
 
@@ -82,7 +82,7 @@ public class PlotView extends View implements Runnable
 
 	private void init()
 	{
-	    plotSheet = globalData.getPlotSheet();
+	    plotSheet = globalData.getPlotSheet(null);
         Log.i("WildPlot::PlotView", "view: " + getHeight() +":" + getWidth());
 		bitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.RGB_565);
 
@@ -203,7 +203,7 @@ public class PlotView extends View implements Runnable
             }
             
             if(globalData.isUpdated()){
-                plotSheet = globalData.getPlotSheet();
+                plotSheet = globalData.getPlotSheet(plotSheet.getPlotImage());
             }
             //System.gc();
             plotCreatorThread = new Thread(plotSheet);

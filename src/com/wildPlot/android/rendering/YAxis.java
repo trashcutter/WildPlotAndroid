@@ -463,4 +463,9 @@ public class YAxis implements Drawable {
     public boolean isClusterable() {
         return true;
     }
+
+    @Override
+    public boolean isCritical() {
+        return true;
+    }
 }

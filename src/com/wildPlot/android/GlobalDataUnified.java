@@ -16,6 +16,7 @@ import com.wildPlot.android.parsing.FunctionParser;
 import com.wildPlot.android.parsing.SplineInterpolation;
 import com.wildPlot.android.regressionFunctions.LinearRegression;
 import com.wildPlot.android.rendering.*;
+import com.wildPlot.android.rendering.graphics.wrapper.BufferedImage;
 import com.wildPlot.android.rendering.graphics.wrapper.Color;
 import com.wildPlot.android.rendering.interfaces.*;
 
@@ -94,8 +95,8 @@ public class GlobalDataUnified extends Application {
 	private double yend = 10;
 	
 	private Vector<Drawable> paintables = new Vector<Drawable>();
-	
-	private AdvancedPlotSheet plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend);
+	private BufferedImage plotImage = null;
+	private AdvancedPlotSheet plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend, plotImage);
 	private boolean hasFrame = false; 
 	
 	
@@ -155,7 +156,7 @@ public class GlobalDataUnified extends Application {
 		
 		paintables.removeAllElements();
 		
-		plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend);
+		plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend, plotImage);
 		hasFrame = false; 
 		
 		
@@ -294,10 +295,10 @@ public class GlobalDataUnified extends Application {
 		this.updated = true;
         mConfigLock.unlock();
 	}
-	public AdvancedPlotSheet getPlotSheet() {
+	public AdvancedPlotSheet getPlotSheet(BufferedImage oldPlotImage) {
         mConfigLock.lock();
         updatePoints();
-		this.plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend);
+		this.plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend, oldPlotImage);
 		xaxis = new XAxis(plotSheet, 0, xTicPixelDistance, xMinorTicPixelDistance);
 		yaxis = new YAxis(plotSheet, 0, yTicPixelDistance, yMinorTicPixelDistance);
 		

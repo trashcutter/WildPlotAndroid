@@ -36,4 +36,6 @@ public interface Drawable {
 	public void abortAndReset();
 
     public boolean isClusterable();
+
+    public boolean isCritical();
 }

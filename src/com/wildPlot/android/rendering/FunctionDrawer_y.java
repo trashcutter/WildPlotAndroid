@@ -259,5 +259,10 @@ public class FunctionDrawer_y implements Drawable {
         return true;
     }
 
+    @Override
+    public boolean isCritical() {
+        return false;
+    }
+
 
 }

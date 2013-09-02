@@ -58,4 +58,8 @@ public class DrawableContainer implements Drawable {
     public boolean isCritical() {
         return isCritical;
     }
+
+    public int getSize(){
+        return drawableVector.size();
+    }
 }

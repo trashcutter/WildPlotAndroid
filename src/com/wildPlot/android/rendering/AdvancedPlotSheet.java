@@ -305,12 +305,16 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
                     if(onFrameContainer.isCritical() == drawable.isCritical()){
                         onFrameContainer.addDrawable(drawable);
                     }else {
-                        onFrameDrawables.add(onFrameContainer);
+
+                        if(onFrameContainer.getSize() > 0)
+                            onFrameDrawables.add(onFrameContainer);
+
                         onFrameContainer = new DrawableContainer(true, drawable.isCritical());
                         onFrameContainer.addDrawable(drawable);
                     }
                 }else{
-                    onFrameDrawables.add(onFrameContainer);
+                    if(onFrameContainer.getSize() > 0)
+                        onFrameDrawables.add(onFrameContainer);
                     onFrameDrawables.add(drawable);
                     onFrameContainer = new DrawableContainer(true, false);
 
@@ -320,12 +324,14 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
                     if(offFrameContainer.isCritical() == drawable.isCritical()){
                         offFrameContainer.addDrawable(drawable);
                     } else {
-                        offFrameDrawables.add(offFrameContainer);
+                        if(offFrameContainer.getSize() > 0)
+                            offFrameDrawables.add(offFrameContainer);
                         offFrameContainer = new DrawableContainer(true, drawable.isCritical());
                         offFrameContainer.addDrawable(drawable);
                     }
                 }else{
-                    offFrameDrawables.add(offFrameContainer);
+                    if(offFrameContainer.getSize() > 0)
+                        offFrameDrawables.add(offFrameContainer);
                     offFrameDrawables.add(drawable);
                     offFrameContainer = new DrawableContainer(false, false);
                 }
@@ -380,85 +386,6 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 	}
 	
 
-	/**
-	 * converts a given x coordinate from ploting field coordinate to a graphic field coordinate
-	 * @param x given graphic x coordinate
-	 * @param field the graphic field
-	 * @return the converted x value
-	 */
-	@Override
-	@Deprecated
-	public int xToGraphic(double x, Rectangle field) {
-
-		return (this.isLogX)?xToGraphicLog(x,field):xToGraphicLinear(x,field);
-	}
-	private int xToGraphicLinear(double x, Rectangle field) {
-		double xQuotient = (field.width - 2*frameThickness) / (Math.abs(this.screenParts.get(currentScreen).getxRange()[1] - this.screenParts.get(currentScreen).getxRange()[0]));
-		double xDistanceFromLeft = x - this.screenParts.get(currentScreen).getxRange()[0];
-		
-		return field.x + frameThickness + (int)Math.round(xDistanceFromLeft * xQuotient);
-	}
-	private int xToGraphicLog(double x, Rectangle field) {
-		double range = Math.log10(this.screenParts.get(currentScreen).getxRange()[1]) - Math.log10(this.screenParts.get(currentScreen).getxRange()[0]);
-		
-		return (int) Math.round(field.x + this.frameThickness + (Math.log10(x) - Math.log10(this.screenParts.get(currentScreen).getxRange()[0]))/(range) * (field.width - 2*frameThickness));
-	}
-	
-	/**
-	 * 
-	 * converts a given y coordinate from ploting field coordinate to a graphic field coordinate
-	 * @param y given graphic y coordinate
-	 * @param field the graphic field
-	 * @return the converted y value
-	 */
-	@Override
-	@Deprecated
-	public int yToGraphic(double y, Rectangle field) {
-		return (this.isLogY)?yToGraphicLog(y,field):yToGraphicLinear(y,field);
-	}
-	
-	
-	private int yToGraphicLinear(double y, Rectangle field) {
-		double yQuotient = (field.height -2*frameThickness) / (Math.abs(this.screenParts.get(currentScreen).getyRange()[1] - this.screenParts.get(currentScreen).getyRange()[0]));
-		double yDistanceFromTop = this.screenParts.get(currentScreen).getyRange()[1] - y;
-		
-		return field.y + frameThickness + (int)Math.round(yDistanceFromTop * yQuotient);
-	}
-	private int yToGraphicLog(double y, Rectangle field) {
-		
-		
-		return (int) Math.round((((Math.log10(y)-Math.log10(this.screenParts.get(currentScreen).getyRange()[0]))/(Math.log10(this.screenParts.get(currentScreen).getyRange()[1]) - Math.log10(this.screenParts.get(currentScreen).getyRange()[0]))) *(field.height-2*this.frameThickness) - (field.height-2*this.frameThickness))*(-1) + this.frameThickness   );
-	}
-	
-	/**
-	 * Convert a coordinate system point to a point used for graphical processing (with hole pixels) 
-	 * @param x given x-coordinate
-	 * @param y given y-coordinate
-	 * @param field clipping bounds for drawing
-	 * @return the point in graphical coordinates
-	 */
-	@Override
-	public int[] toGraphicPoint(double x, double y, Rectangle field) {
-		int[] graphicPoint = {xToGraphic(x, field), yToGraphic(y, field)};
-		return graphicPoint;
-	}
-	
-	/**
-	 * Transforms a graphical x-value to a x-value from the plotting coordinate system.
-	 * This method should not be used for future compatibility as transformations in more complex coordinate systems 
-	 * cannot be done by only giving one coordinate
-	 * @param x graphical x-coordinate
-	 * @param field clipping bounds
-	 * @return x-coordinate in plotting coordinate system
-	 */
-	@Override
-	@Deprecated
-	public double xToCoordinate(int x, Rectangle field) {
-		
-		
-		return (this.isLogX)?xToCoordinateLog(x,field):xToCoordinateLinear(x,field);
-	}
-	
 	private double xToCoordinateLinear(int x, Rectangle field) {
 		double xQuotient = (Math.abs(this.screenParts.get(currentScreen).getxRange()[1] - this.screenParts.get(currentScreen).getxRange()[0])) / (field.width-2*frameThickness);
 		double xDistanceFromLeft = field.x - frameThickness + x;
@@ -472,135 +399,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		return Math.pow(10, ((x- (field.x + this.frameThickness))*1.0*(range) )/(field.width - 2.0*frameThickness) + Math.log10(this.screenParts.get(currentScreen).getxRange()[0]) ) ;
 	}
 	
-	
-	/**
-	 * Transforms a graphical y-value to a y-value from the plotting coordinate system.
-	 * This method should not be used for future compatibility as transformations in more complex coordinate systems 
-	 * cannot be done by only giving one coordinate
-	 * @param y graphical y-coordinate
-	 * @param field clipping bounds
-	 * @return y-coordinate in plotting coordinate system
-	 */
-	@Override
-	@Deprecated
-	public double yToCoordinate(int y, Rectangle field) {
-		
-		
-		return (this.isLogY)?yToCoordinateLog(y, field):yToCoordinateLinear(y, field);
-	}
-	
-	@Override
-	public double yToCoordinateLinear(int y, Rectangle field) {
-		double yQuotient = (Math.abs(this.screenParts.get(currentScreen).getyRange()[1] - this.screenParts.get(currentScreen).getyRange()[0])) / (field.height -2*frameThickness);
-		double yDistanceFromBottom = field.y + field.height - 1 - y -frameThickness;
-		
-		return this.screenParts.get(currentScreen).getyRange()[0] + yDistanceFromBottom*yQuotient;
-	}
-	
-	@Override
-	public double yToCoordinateLog(int y, Rectangle field) {
 
-		return Math.pow(10, ((y - this.frameThickness + (field.height-2*this.frameThickness))*(-1))/((field.height-2*this.frameThickness))*((Math.log10(this.screenParts.get(currentScreen).getyRange()[1]) - Math.log10(this.screenParts.get(currentScreen).getyRange()[0]))) +Math.log10(this.screenParts.get(currentScreen).getyRange()[0]));
-	}
-	
-	/**
-	 * Convert a graphical coordinate-system point to a point used for plotting processing 
-	 * @param x given graphical x
-	 * @param y given graphical y
-	 * @param field clipping bounds for drawing
-	 * @return the point in plotting coordinates
-	 */
-	@Override
-	public double[] toCoordinatePoint(int x, int y, Rectangle field) {
-		double[] coordinatePoint = {xToCoordinate(x, field), yToCoordinate(y, field)};
-		
-		return coordinatePoint;
-	}
-
-	
-	/**
-	 * the x-range for the plot
-	 * @return double array in the lenght of two with the first element beeingt left and the second element beeing the right border
-	 */
-	@Override
-	public double[] getxRange() {
-		return this.screenParts.get(0).getxRange();
-	}
-	
-	/**
-	 * sets new bounds for x coordinates on the plot
-	 * @param xRange double array in the length of two with the first element beeingt left and the second element beeing the right border
-	 */
-	@Override
-	public void setxRange(double[] xRange) {
-		this.screenParts.get(0).setxRange(xRange);
-	}
-	
-	/**
-	 * the <-range for the plot
-	 * @return double array in the lenght of two with the first element being lower and the second element being the upper border
-	 */
-	@Override
-	public double[] getyRange() {
-		return this.screenParts.get(0).getyRange();
-	}
-	
-	/**
-	 * sets new bounds for y coordinates on the plot
-	 * @param yRange double array in the length of two with the first element beeingt left and the second element beeing the right border
-	 */
-	@Override
-	public void setyRange(double[] yRange) {
-		this.screenParts.get(0).setyRange(yRange);
-	}
-	
-	/**
-	 * returns the size in pixel of the outer frame
-	 * @return the size of the outer frame in pixel
-	 */
-	@Override
-	public int getFrameThickness() {
-		return (isMultiMode)? 0:frameThickness;
-	}
-	
-	/**
-	 * set the size of the outer frame in pixel
-	 * @param frameThickness new size for the outer frame in pixel
-	 */
-	@Override
-	public void setFrameThickness(int frameThickness) {
-		if(frameThickness < 0){
-			System.err.println("PlotSheet:Error::Wrong Frame size (smaller than 0)");
-			System.exit(-1);
-		}
-		this.frameThickness = frameThickness;
-	}
-	
-	/**
-	 * sets the size of the border between plot and outer frame in pixel
-	 * @param borderThickness size of border in pixel
-	 */
-	@Override
-	public void setBorderThickness(int borderThickness) {
-		this.borderThickness = borderThickness;
-		this.isBordered = true;
-	}
-	
-	/**
-	 * activates the border between outer frame and plot
-	 */
-	@Override
-	public void setBorder() {
-		this.isBordered = true;
-	}
-	
-	/**
-	 * deactivates the border between outer frame and plot
-	 */
-	@Override
-	public void unsetBorder() {
-		this.isBordered = false;
-	}
 	
 	/*
 	 * (non-Javadoc)

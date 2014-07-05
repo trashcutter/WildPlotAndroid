@@ -3,21 +3,22 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.4'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 dependencies {
+    compile "com.android.support:support-v4:20.0.+"
 }
 
 android {
-    compileSdkVersion 15
-    buildToolsVersion "15"
+    compileSdkVersion 20
+    buildToolsVersion "20"
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 15
+        minSdkVersion 18
+        targetSdkVersion 18
     }
     sourceSets {
         main {
@@ -31,5 +32,7 @@ android {
         }
 
         instrumentTest.setRoot('tests')
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
     }
 }

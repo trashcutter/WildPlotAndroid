@@ -34,9 +34,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:ems="10"
-                android:inputType="numberSigned|numberDecimal" />
+                android:inputType="number" />
         </TableRow>
+        <TableRow
+            android:id="@+id/table_row_regression_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
 
+
+        </TableRow>
 		<TableRow
             android:id="@+id/tableRowRegression"
             android:layout_width="wrap_content"
@@ -59,6 +66,13 @@
                 android:layout_weight="2"
                 android:gravity="center" />
         </TableRow>
+        <ProgressBar
+            android:id="@+id/progressBarRegression"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+
         <TableRow
             android:id="@+id/tableRowRegressionM"
             android:layout_width="wrap_content"

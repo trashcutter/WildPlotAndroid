@@ -293,7 +293,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="@string/settings_kde_histo_topic"
+                android:text="@string/settings_regression_topic"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
             <Button
                 android:id="@+id/button_setup_regression"

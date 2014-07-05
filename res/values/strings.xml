@@ -44,4 +44,5 @@
     <string name="settings_activate_histo_kde">activate</string>
     <string name="kde_settings_kernel">Kernel</string>
     <string name="settings_setup_kde_button">setup</string>
+    <string name="settings_regression_topic">Regression Settings</string>
 </resources>

@@ -110,7 +110,7 @@ public class GlobalDataUnified extends Application {
 
     private int frameBorderPixelSize = 80;
     private double func3DScaleOrder = 0.9;
-    private int colorCount = 50;
+    private int colorCount = 150;
 
 	
 	//this probably brings a lot of errors if new stuff is unregarded in this method

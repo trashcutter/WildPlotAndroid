@@ -230,9 +230,13 @@ public class YAxis implements Drawable {
 //			fontAT.rotate(-Math.PI/2.0);
 //			Font newFont = oldFont.deriveFont(fontAT);
 //			g.setFont(newFont);
-			
+
+            g.save();
+
 			int[] middlePosition = {plotSheet.xToGraphic(xOffset, field), plotSheet.yToGraphic( 0, field) };
+            g.rotate(-90, middlePosition[0]-46, field.height/2+width/2);
 			g.drawString(this.name, middlePosition[0]-46, field.height/2+width/2);
+            g.restore();
 //			g.setFont(oldFont);
 		}
 		

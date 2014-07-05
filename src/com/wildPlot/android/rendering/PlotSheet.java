@@ -20,42 +20,42 @@ import com.wildPlot.android.rendering.interfaces.Drawable;
  * legends and descriptors. Additionally all conversions from image to plot coordinates are done here
  */
 public class PlotSheet implements Drawable {
-	private boolean isLogX = false;
-	
-	private boolean isLogY = false;
-	private boolean hasTitle = false;
+	protected boolean isLogX = false;
+
+    protected boolean isLogY = false;
+    protected boolean hasTitle = false;
 	
 	/**
 	 * title of plotSheet
 	 */
-	private String title = "PlotSheet";
+    protected String title = "PlotSheet";
 	
 	/**
 	 * not yet implemented
 	 */
-	private boolean isMultiMode = false;
+    protected boolean isMultiMode = false;
 	
 	/**
 	 * thickness of frame in pixel
 	 */
-	private int frameThickness = 0;
+    protected int frameThickness = 0;
 	
 	/**
 	 * states if there is a border between frame and plot
 	 */
-	private boolean isBordered = true;
+    protected boolean isBordered = true;
 	
 	/**
 	 * thickness of border in pixel, until now more than 1 may bring problems for axis drawing
 	 */
-	private int borderThickness = 1;
+    protected int borderThickness = 1;
 	
 	//if class shold be made threadable for mulitplot mode, than
 	//this must be done otherwise
 	/**
 	 * screen that is currently rendered
 	 */
-	private int currentScreen = 0;
+    protected int currentScreen = 0;
 	
 	/**
 	 * the ploting screens, screen 0 is the only one in single mode

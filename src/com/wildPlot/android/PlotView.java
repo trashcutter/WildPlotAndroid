@@ -45,7 +45,7 @@ public class PlotView extends View implements Runnable
 	
 	
 	boolean isInitialized;
-	Paint paint = new Paint();
+	Paint paint = new Paint(Paint.LINEAR_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
 	PlotView thisView;
 	
 	public PlotView(Context context)

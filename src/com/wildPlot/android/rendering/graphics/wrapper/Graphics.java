@@ -123,6 +123,17 @@ public class Graphics {
     public void dispose(){
         //TODO: search if there is something to do with it
     }
-    
+
+    public int save(){
+        return canvas.save();
+    }
+
+    public void restore(){
+        canvas.restore();
+    }
+
+    public void rotate(float degree, float x, float y){
+        canvas.rotate(degree, x, y);
+    }
     
 }

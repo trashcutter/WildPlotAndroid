@@ -18,9 +18,9 @@ public class BufferedImage {
     public Graphics2D createGraphics(){
         Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(android.graphics.Color.TRANSPARENT, Mode.CLEAR);
-        Paint paint = new Paint();
+        Paint paint = new Paint(Paint.LINEAR_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Style.STROKE);
-        
+//        System.err.println("XFERMODE: "+paint.getXfermode().toString());
 //        Paint transPainter = new Paint();
 //        transPainter.setXfermode(new PorterDuffXfermode(Mode.CLEAR));
 //                   

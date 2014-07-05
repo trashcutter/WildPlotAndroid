@@ -130,6 +130,14 @@ public class Settings extends Fragment implements View.OnClickListener, TextWatc
             }
         });
 
+        final Button setupRegressionButton = (Button) rootView.findViewById(R.id.button_setup_regression);
+        setupRegressionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RegressionSettingsDialog dialog = new RegressionSettingsDialog(gs);
+                dialog.show(getActivity().getSupportFragmentManager(), "RegressionSettingsDialog");
+            }
+        });
 
         viewIsCreated = true;
 		return rootView;

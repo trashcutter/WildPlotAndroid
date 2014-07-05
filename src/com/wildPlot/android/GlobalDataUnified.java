@@ -110,6 +110,7 @@ public class GlobalDataUnified extends Application {
 
     private int frameBorderPixelSize = 80;
     private double func3DScaleOrder = 0.9;
+    private int colorCount = 50;
 
 	
 	//this probably brings a lot of errors if new stuff is unregarded in this method
@@ -429,7 +430,7 @@ public class GlobalDataUnified extends Application {
             TopLevelParser func3D = new TopLevelParser(funcExpression3D, this.parserRegister);
             parserRegister.put(func3D.getFuncName(), func3D);
 
-            ReliefDrawer reliefDrawer = new ReliefDrawer(func3DScaleOrder, 200, func3D, plotSheet, true);
+            ReliefDrawer reliefDrawer = new ReliefDrawer(func3DScaleOrder, colorCount, func3D, plotSheet, true);
             reliefDrawer.setThreadCnt(3);
             reliefDrawer.setPixelSkip(3);
             plotSheet.addDrawable(reliefDrawer);
@@ -481,7 +482,7 @@ public class GlobalDataUnified extends Application {
 
             }
             Density2D density2D = new Density2D(pointsOfAssignment, this.widthX, this.widthY, kernelFunc);
-            ReliefDrawer reliefDrawer = new ReliefDrawer(0.9, 110, density2D, plotSheet, true);
+            ReliefDrawer reliefDrawer = new ReliefDrawer(func3DScaleOrder, colorCount, density2D, plotSheet, true);
             reliefDrawer.setThreadCnt(2);
             PointDrawer2D pointDrawer = new PointDrawer2D(plotSheet, pointsOfAssignment, Color.red.darker());
             KDE kde = new KDE(pointsOfAssignment[0], this.widthX, kernelFunc);

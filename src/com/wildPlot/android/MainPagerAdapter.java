@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import java.util.HashMap;
 import java.util.Locale;

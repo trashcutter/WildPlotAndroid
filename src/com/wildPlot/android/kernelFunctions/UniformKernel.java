@@ -1,7 +1,7 @@
-package com.wildPlot.android.kernelFunctions;
+package com.wildplot.android.kernelFunctions;
 
 
-import com.wildPlot.android.rendering.interfaces.Function2D;
+import com.wildplot.android.rendering.interfaces.Function2D;
 
 public class UniformKernel implements Function2D {
 

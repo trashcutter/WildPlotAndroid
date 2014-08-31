@@ -1,18 +1,15 @@
 /**
  * 
  */
-package com.wildPlot.android.rendering;
+package com.wildplot.android.rendering;
 
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.wildPlot.android.rendering.graphics.wrapper.BufferedImage;
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.FontMetrics;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics2D;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.graphics.wrapper.*;
+import com.wildplot.android.rendering.graphics.wrapper.BufferedImageWrap;
+import com.wildplot.android.rendering.interfaces.Drawable;
 
 
 /**
@@ -23,9 +20,9 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 	
 	private ReentrantLock reentrantLock = new ReentrantLock();
 	private boolean pictureIsConstructed = false;
-	private BufferedImage plotImage = null;
+	private BufferedImageWrap plotImage = null;
 	private boolean operationIsAborted = false;
-	private Rectangle field;
+	private RectangleWrap field;
 
 	private boolean hasFirstPixelSkipSet = false;
 	private int firstPixelSkip = 20;
@@ -55,7 +52,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 	 * @param yStart the start of the y-range
 	 * @param yEnd the end of the y-range
 	 */
-	public AdvancedPlotSheet(double xStart, double xEnd, double yStart, double yEnd, BufferedImage plotImage) {
+	public AdvancedPlotSheet(double xStart, double xEnd, double yStart, double yEnd, BufferedImageWrap plotImage) {
 		super(xStart, xEnd, yStart, yEnd);
 		double[] xRange = {xStart, xEnd};
 		double[] yRange = {yStart, yEnd};
@@ -64,7 +61,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		
 	}
 	
-	public void setClip(Rectangle field){
+	public void setClip(RectangleWrap field){
 		this.field = field;
 	}
 	
@@ -79,10 +76,10 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		Vector<DrawableDrawingRunnable> offFrameDrawables = new Vector<DrawableDrawingRunnable>();
 		Vector<DrawableDrawingRunnable> onFrameDrawables = new Vector<DrawableDrawingRunnable>();
 		//System.err.println("APlotSheet: field: " + field.width + " : " + field.height);
-		BufferedImage bufferedFrameImage = new BufferedImage(field.width, field.height, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D gFrame = bufferedFrameImage.createGraphics();
+		BufferedImageWrap bufferedFrameImage = new BufferedImageWrap(field.width, field.height, BufferedImageWrap.TYPE_INT_ARGB);
+		GraphicsWrap2D gFrame = bufferedFrameImage.createGraphics();
 		gFrame.setClip(field);
-		gFrame.setColor(Color.BLACK);
+		gFrame.setColor(ColorWrap.BLACK);
 		Thread[] threads = new Thread[this.screenParts.get(currentScreen).getDrawables().size()]; 
 		int i = 0;
 		
@@ -101,9 +98,9 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		}
 		
 		//paint white frame to over paint everything that was drawn over the border 
-		Color oldColor = gFrame.getColor();
+		ColorWrap oldColorWrap = gFrame.getColor();
 		if(this.frameThickness>0){
-			gFrame.setColor(Color.WHITE);
+			gFrame.setColor(ColorWrap.WHITE);
 			//upper frame
 			gFrame.fillRect(0, 0, field.width, this.frameThickness);
 
@@ -118,7 +115,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 			
 			//make small black border frame
 			if(isBordered){
-				gFrame.setColor(Color.black);
+				gFrame.setColor(ColorWrap.black);
 				//upper border
 				gFrame.fillRect(this.frameThickness-borderThickness+1, this.frameThickness-borderThickness+1, field.width-2*this.frameThickness+2*borderThickness-2, borderThickness);
 				
@@ -133,11 +130,11 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 				
 			}
 			
-			gFrame.setColor(oldColor);
+			gFrame.setColor(oldColorWrap);
 			
 //			Font oldFont = gFrame.getFont();
 //			gFrame.setFont(oldFont.deriveFont(20.0f));
-			FontMetrics fm = gFrame.getFontMetrics();
+			FontMetricsWrap fm = gFrame.getFontMetrics();
 			int height = fm.getHeight();
 			
 			int width = fm.stringWidth(this.title);
@@ -196,7 +193,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								BufferedImage oldReliefImage = currentDrawableRunnable.getBufferedDrawableImage();
+								BufferedImageWrap oldReliefImage = currentDrawableRunnable.getBufferedDrawableImage();
 								currentDrawableRunnable.setBufferedOldDrawableImage(oldReliefImage);
 								threads[i] = new Thread(currentDrawableRunnable);
 								threads[i].start();
@@ -219,8 +216,8 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 					finished = false;
 				}
 			}
-			BufferedImage buffTempImage = new BufferedImage(field.width, field.height, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g =  buffTempImage.createGraphics();
+			BufferedImageWrap buffTempImage = new BufferedImageWrap(field.width, field.height, BufferedImageWrap.TYPE_INT_ARGB);
+			GraphicsWrap2D g =  buffTempImage.createGraphics();
 			g.setClip(field);
 			
 			for(DrawableDrawingRunnable offFrameDrawable : offFrameDrawables){
@@ -365,7 +362,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
     }
 
 
-	public BufferedImage getPlotImage(){
+	public BufferedImageWrap getPlotImage(){
 		reentrantLock.lock();
 		try{
 			return plotImage;
@@ -384,11 +381,11 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		private boolean hasFinished = false;
 		private boolean hasJoined = false;
 		
-		private BufferedImage bufferedDrawableImage;
-		private BufferedImage bufferedOldDrawableImage = null;
-		private Rectangle field;
+		private BufferedImageWrap bufferedDrawableImage;
+		private BufferedImageWrap bufferedOldDrawableImage = null;
+		private RectangleWrap field;
 
-		public DrawableDrawingRunnable(Drawable drawable, Rectangle field) {
+		public DrawableDrawingRunnable(Drawable drawable, RectangleWrap field) {
 			super();
 			this.drawable = drawable;
 			this.field = field;
@@ -399,10 +396,10 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		@Override
 		public void run() {
 		    this.hasFinished = false;
-			bufferedDrawableImage = new BufferedImage(field.width, field.height, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g = bufferedDrawableImage.createGraphics();
+			bufferedDrawableImage = new BufferedImageWrap(field.width, field.height, BufferedImageWrap.TYPE_INT_ARGB);
+			GraphicsWrap2D g = bufferedDrawableImage.createGraphics();
 			g.setClip(field);
-			g.setColor(Color.BLACK);
+			g.setColor(ColorWrap.BLACK);
 			drawable.paint(g);
 			g.dispose();
 			this.hasFinished = true;
@@ -419,17 +416,17 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		public boolean hasJoined(){
 			return hasJoined;
 		}
-		public BufferedImage getBufferedDrawableImage() {
+		public BufferedImageWrap getBufferedDrawableImage() {
 			return bufferedDrawableImage;
 		}
 
 
-		public BufferedImage getBufferedOldDrawableImage() {
+		public BufferedImageWrap getBufferedOldDrawableImage() {
 			return bufferedOldDrawableImage;
 		}
 
 
-		public void setBufferedOldDrawableImage(BufferedImage bufferedOldDrawableImage) {
+		public void setBufferedOldDrawableImage(BufferedImageWrap bufferedOldDrawableImage) {
 			this.bufferedOldDrawableImage = bufferedOldDrawableImage;
 		}
 

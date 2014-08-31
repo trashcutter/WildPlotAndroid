@@ -13,18 +13,18 @@
  * You should have received a copy of the GNU General Public License along with         *
  * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
  ****************************************************************************************/
-package com.wildplot.android.rendering.interfaces;
+package com.wildplot.android.rendering.graphics.wrapper;
 
-/**
- * Interface for functions with one dependent variable
- */
-public interface Function2D {
+public class StrokeWrap {
+    private float strokeSize = 0f;
 
-	/**
-	 * 
-	 * @param x given x value
-	 * @return calculated y value
-	 */
-	public double f(double x);
+    public StrokeWrap(float strokeSize) {
+        super();
+        this.strokeSize = strokeSize;
+    }
 
+    public float getStrokeSize() {
+        return strokeSize;
+    }
+    
 }

@@ -1,8 +1,8 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
-import com.wildPlot.MyMath.Matrix_d;
-import com.wildPlot.MyMath.Polynomial;
-import com.wildPlot.MyMath.Vector_d;
+import com.wildplot.MyMath.Matrix_d;
+import com.wildplot.MyMath.Polynomial;
+import com.wildplot.MyMath.Vector_d;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,10 +1,10 @@
-package com.wildPlot.android.regressionFunctions;
+package com.wildplot.android.regressionFunctions;
 
 
-import com.wildPlot.MyMath.Matrix_d;
-import com.wildPlot.MyMath.Polynomial;
-import com.wildPlot.MyMath.Vector_d;
-import com.wildPlot.android.rendering.interfaces.Function2D;
+import com.wildplot.MyMath.Matrix_d;
+import com.wildplot.MyMath.Polynomial;
+import com.wildplot.MyMath.Vector_d;
+import com.wildplot.android.rendering.interfaces.Function2D;
 
 public class LinearRegression implements Function2D {
 

@@ -1,10 +1,10 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.util.Log;
-import com.wildPlot.android.rendering.*;
-import com.wildPlot.android.rendering.graphics.wrapper.*;
+import com.wildplot.android.rendering.*;
+import com.wildplot.android.rendering.graphics.wrapper.*;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -37,7 +37,7 @@ public class PlotView extends View implements Runnable
     private int unitsToScroll = 0;
     private boolean hasScrolled = false;
 	Bitmap bitmap;
-	BufferedImage buffImage;
+	BufferedImageWrap buffImage;
 	Canvas bitmapCanvas;
 	GlobalDataUnified globalData = new GlobalDataUnified();
 	AdvancedPlotSheet plotSheet;
@@ -129,14 +129,14 @@ public class PlotView extends View implements Runnable
 		
 				
 		
-		Graphics g = new Graphics2D(canvas, paint);
+		GraphicsWrap g = new GraphicsWrap2D(canvas, paint);
 		
         this.getDrawingRect(field);
-        Rectangle rectangle = new Rectangle(field);
-		g.setClip(rectangle);
+        RectangleWrap rectangleWrap = new RectangleWrap(field);
+		g.setClip(rectangleWrap);
 		canvas.drawColor(android.graphics.Color.WHITE, Mode.CLEAR);
 		
-        BufferedImage plotImage = plotSheet.getPlotImage();
+        BufferedImageWrap plotImage = plotSheet.getPlotImage();
         finishedImageCheckLock.lock();
         if(plotSheet.isFinished() && !this.finishedImageIsOnDisplay)
             this.finishedImageIsOnDisplay = true;
@@ -164,7 +164,7 @@ public class PlotView extends View implements Runnable
 		
 		while(true) {
 		    this.getDrawingRect(field);
-	        Rectangle canvasBoundarys = new Rectangle(field);
+	        RectangleWrap canvasBoundarys = new RectangleWrap(field);
 	        //System.err.println("APlotView: field: " + field.width() + " : " + field.height());
             //checkAndProcessZooming(canvasBoundarys);
             try {
@@ -188,7 +188,7 @@ public class PlotView extends View implements Runnable
 		
 	}
 	
-	private boolean checkAndProcessImageReconstruction(Rectangle field) throws InterruptedException{
+	private boolean checkAndProcessImageReconstruction(RectangleWrap field) throws InterruptedException{
 	    
         boolean newConstructionOfPlotImageIsNecessary = (plotSheet.getPlotImage() == null && this.plotCreatorThread == null) ||  field.width != savedPlotWidth || field.height != savedPlotHeight || globalData.isUpdated() || isJustInitialized;
         isJustInitialized = false;
@@ -244,8 +244,8 @@ public class PlotView extends View implements Runnable
 	        case MotionEvent.ACTION_UP: 
 	        	Rect field = new Rect();
 	        	this.getDrawingRect(field);
-	        	Rectangle rectangle = new Rectangle(field);
-	        	double[] coord = this.plotSheet.toCoordinatePoint(x, y, rectangle);
+	        	RectangleWrap rectangleWrap = new RectangleWrap(field);
+	        	double[] coord = this.plotSheet.toCoordinatePoint(x, y, rectangleWrap);
 	        	
 	        	this.globalData.addPointFromScreen(coord[0], coord[1]);break;
 	    }

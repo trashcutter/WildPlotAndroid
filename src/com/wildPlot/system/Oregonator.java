@@ -1,6 +1,6 @@
-package com.wildPlot.system;
+package com.wildplot.system;
 
-import com.wildPlot.MyMath.Matrix_d;
+import com.wildplot.MyMath.Matrix_d;
 
 ////	Oregonator: a periodic chemical reaction
 ////	simplified description of this reaction:

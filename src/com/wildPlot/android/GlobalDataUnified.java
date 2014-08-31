@@ -1,4 +1,4 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,19 +6,19 @@ import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.util.Log;
-import com.wildPlot.android.control.FunctionParserWrapper;
-import com.wildPlot.android.densityFunctions.ASH;
-import com.wildPlot.android.densityFunctions.Density2D;
-import com.wildPlot.android.densityFunctions.KDE;
-import com.wildPlot.android.kernelFunctions.*;
-import com.wildPlot.android.newParsing.TopLevelParser;
-import com.wildPlot.android.parsing.FunctionParser;
-import com.wildPlot.android.parsing.SplineInterpolation;
-import com.wildPlot.android.regressionFunctions.LinearRegression;
-import com.wildPlot.android.rendering.*;
-import com.wildPlot.android.rendering.graphics.wrapper.BufferedImage;
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.interfaces.*;
+import com.wildplot.android.control.FunctionParserWrapper;
+import com.wildplot.android.densityFunctions.ASH;
+import com.wildplot.android.densityFunctions.Density2D;
+import com.wildplot.android.densityFunctions.KDE;
+import com.wildplot.android.kernelFunctions.*;
+import com.wildplot.android.newParsing.TopLevelParser;
+import com.wildplot.android.parsing.FunctionParser;
+import com.wildplot.android.parsing.SplineInterpolation;
+import com.wildplot.android.regressionFunctions.LinearRegression;
+import com.wildplot.android.rendering.*;
+import com.wildplot.android.rendering.graphics.wrapper.BufferedImageWrap;
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildplot.android.rendering.interfaces.*;
 
 
 
@@ -66,7 +66,7 @@ public class GlobalDataUnified extends Application {
 	private double[][] touchPoints;
 	private boolean arrayHasChanged = true;
 	
-	private Color touchPointColor =  Color.RED;
+	private ColorWrap touchPointColorWrap =  ColorWrap.RED;
 
 	private float lineThickness = 2;
 	
@@ -79,12 +79,12 @@ public class GlobalDataUnified extends Application {
 	private Vector<double[][]> linesPointVector 			= new Vector<double[][]>();
 	private Vector<double[][]> linesVector 					= new Vector<double[][]>();
 	private HashMap<Object, String> NameList 				= new HashMap<Object, String>();
-	private HashMap<Object, Color> colorDef 				= new HashMap<Object, Color>();
+	private HashMap<Object, ColorWrap> colorDef 				= new HashMap<Object, ColorWrap>();
 	private Vector<double[][]> pointVector 					= new Vector<double[][]>();
 	private HashMap<double[][], Boolean> isSpline			= new HashMap<double[][], Boolean>();
 	
-	private final Color[] gradientColors = {
-			Color.RED, Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN, Color.DARK_GRAY, Color.LIGHT_GRAY, Color.YELLOW
+	private final ColorWrap[] gradientColorWraps = {
+			ColorWrap.RED, ColorWrap.GREEN, ColorWrap.BLUE, ColorWrap.MAGENTA, ColorWrap.CYAN, ColorWrap.DARK_GRAY, ColorWrap.LIGHT_GRAY, ColorWrap.YELLOW
 		};
 	private int colorCnt = 1;
 	
@@ -95,7 +95,7 @@ public class GlobalDataUnified extends Application {
 	private double yend = 10;
 	
 	private Vector<Drawable> paintables = new Vector<Drawable>();
-	private BufferedImage plotImage = null;
+	private BufferedImageWrap plotImage = null;
 	private AdvancedPlotSheet plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend, plotImage);
 	private boolean hasFrame = false; 
 	
@@ -198,14 +198,14 @@ public class GlobalDataUnified extends Application {
 		//TODO: abrastern vorher (Dopplungen)
 		func2DVector.add(func);
 		NameList.put(func, name);
-		this.colorDef.put(func, gradientColors[colorCnt++%(gradientColors.length)]);
+		this.colorDef.put(func, gradientColorWraps[colorCnt++%(gradientColorWraps.length)]);
 		this.updated = true;
         mConfigLock.unlock();
 	}
 
     public void plotWithNewParser(String expression){
         mConfigLock.lock();
-        this.colorDef.put(expression, gradientColors[colorCnt++%(gradientColors.length)]);
+        this.colorDef.put(expression, gradientColorWraps[colorCnt++%(gradientColorWraps.length)]);
         this.funcExpressionVector.add(expression);
         this.updated = true;
         mConfigLock.unlock();
@@ -223,7 +223,7 @@ public class GlobalDataUnified extends Application {
 		this.pointVector.add(points);
 		NameList.put(points, name);
 		this.isSpline.put(points, isSpline);
-		this.colorDef.put(points, gradientColors[colorCnt++%(gradientColors.length)]);
+		this.colorDef.put(points, gradientColorWraps[colorCnt++%(gradientColorWraps.length)]);
 		this.updated = true;
         mConfigLock.unlock();
 	}
@@ -237,7 +237,7 @@ public class GlobalDataUnified extends Application {
         mConfigLock.lock();
 		this.linesPointVector.add(points);
 		NameList.put(points, name);
-		this.colorDef.put(points, gradientColors[colorCnt++%(gradientColors.length)]);
+		this.colorDef.put(points, gradientColorWraps[colorCnt++%(gradientColorWraps.length)]);
 		this.updated = true;
         mConfigLock.unlock();
 	}
@@ -251,7 +251,7 @@ public class GlobalDataUnified extends Application {
         mConfigLock.lock();
 		this.linesVector.add(points);
 		NameList.put(points, name);
-		this.colorDef.put(points, gradientColors[colorCnt++%(gradientColors.length)]);
+		this.colorDef.put(points, gradientColorWraps[colorCnt++%(gradientColorWraps.length)]);
 		this.updated = true;
         mConfigLock.unlock();
 	}
@@ -296,7 +296,7 @@ public class GlobalDataUnified extends Application {
 		this.updated = true;
         mConfigLock.unlock();
 	}
-	public AdvancedPlotSheet getPlotSheet(BufferedImage oldPlotImage) {
+	public AdvancedPlotSheet getPlotSheet(BufferedImageWrap oldPlotImage) {
         mConfigLock.lock();
         updatePoints();
 		this.plotSheet = new AdvancedPlotSheet(xstart, xend, ystart, yend, oldPlotImage);
@@ -335,13 +335,13 @@ public class GlobalDataUnified extends Application {
 		
 		
 		for(double[][] points:this.linesVector){
-			Color thisColor = colorDef.get(points);
-			Lines lines = new Lines(plotSheet, points, thisColor);
+			ColorWrap thisColorWrap = colorDef.get(points);
+			Lines lines = new Lines(plotSheet, points, thisColorWrap);
 			plotSheet.addDrawable(lines);
 		}
 		for(double[][] points:this.linesPointVector){
-		    Color thisColor = colorDef.get(points);
-			LinesPoints linesPoints = new LinesPoints(plotSheet, points, thisColor);
+		    ColorWrap thisColorWrap = colorDef.get(points);
+			LinesPoints linesPoints = new LinesPoints(plotSheet, points, thisColorWrap);
 			plotSheet.addDrawable(linesPoints);
 		}
 		for(Function2D func:func2DVector){
@@ -366,9 +366,9 @@ public class GlobalDataUnified extends Application {
             Log.i("WildPlot::GlobalDataUnified", "Plotting points on sheet. TouchPointType: " + touchPointType);
             //draw hand drawn points
 			switch(touchPointType) {
-			case  points: PointDrawer2D pointDrawer = new PointDrawer2D(plotSheet, this.touchPoints, touchPointColor);
+			case  points: PointDrawer2D pointDrawer = new PointDrawer2D(plotSheet, this.touchPoints, touchPointColorWrap);
 			plotSheet.addDrawable(pointDrawer); break;
-			case linespoints: LinesPoints linesPoints = new LinesPoints(plotSheet, this.touchPoints, touchPointColor);
+			case linespoints: LinesPoints linesPoints = new LinesPoints(plotSheet, this.touchPoints, touchPointColorWrap);
 			plotSheet.addDrawable(linesPoints); break;
 			case spline:
 				System.err.println("spline processing!");
@@ -388,7 +388,7 @@ public class GlobalDataUnified extends Application {
 				}
 				System.err.println("spline limits: left: " + leftLimit + "right: " + rightLimit);
 				System.err.println("spline Test: " + interpol.f(0));
-				FunctionDrawer functionDrawer = new FunctionDrawer(interpol, plotSheet, touchPointColor, leftLimit, rightLimit);
+				FunctionDrawer functionDrawer = new FunctionDrawer(interpol, plotSheet, touchPointColorWrap, leftLimit, rightLimit);
 				functionDrawer.setSize(lineThickness);
 				plotSheet.addDrawable(functionDrawer); break;
 			}
@@ -440,13 +440,13 @@ public class GlobalDataUnified extends Application {
         double[][] pointsOfAssignment = touchPoints;
         if (kdeIsActivated && pointsOfAssignment != null && pointsOfAssignment[0].length > 0 && funcExpression3D == null) {
             XAxisHistoGram histogramX = new XAxisHistoGram(plotSheet, pointsOfAssignment, this.originX,
-                    this.widthX, Color.red);
+                    this.widthX, ColorWrap.red);
             YAxisHistoGram histogramY = new YAxisHistoGram(plotSheet, pointsOfAssignment, this.originY,
-                    this.widthY, Color.red);
+                    this.widthY, ColorWrap.red);
             histogramX.setFilling(true);
             histogramY.setFilling(true);
-            histogramX.setFillColor(new Color(0f, 1f, 0f, 0.5f));
-            histogramY.setFillColor(new Color(0f, 1f, 0f, 0.5f));
+            histogramX.setFillColorWrap(new ColorWrap(0f, 1f, 0f, 0.5f));
+            histogramY.setFillColorWrap(new ColorWrap(0f, 1f, 0f, 0.5f));
             Function2D kernelFunc;
             switch (kernel) {
                 case Uniform:
@@ -484,15 +484,15 @@ public class GlobalDataUnified extends Application {
             Density2D density2D = new Density2D(pointsOfAssignment, this.widthX, this.widthY, kernelFunc);
             ReliefDrawer reliefDrawer = new ReliefDrawer(func3DScaleOrder, colorCount, density2D, plotSheet, true);
             reliefDrawer.setThreadCnt(2);
-            PointDrawer2D pointDrawer = new PointDrawer2D(plotSheet, pointsOfAssignment, Color.red.darker());
+            PointDrawer2D pointDrawer = new PointDrawer2D(plotSheet, pointsOfAssignment, ColorWrap.red.darker());
             KDE kde = new KDE(pointsOfAssignment[0], this.widthX, kernelFunc);
-            FunctionDrawer KDEfunctionX = new FunctionDrawer(kde, plotSheet, new Color(255, 0, 0));
+            FunctionDrawer KDEfunctionX = new FunctionDrawer(kde, plotSheet, new ColorWrap(255, 0, 0));
             KDE kdeY = new KDE(pointsOfAssignment[1], this.widthY, kernelFunc);
-            FunctionDrawer_y KDEfunctionY = new FunctionDrawer_y(kdeY, plotSheet, new Color(255, 0, 0));
+            FunctionDrawer_y KDEfunctionY = new FunctionDrawer_y(kdeY, plotSheet, new ColorWrap(255, 0, 0));
             ASH ashX = new ASH(this.originX, mX, this.widthX, pointsOfAssignment[0]);
-            FunctionDrawer ASHFunctionX = new FunctionDrawer(ashX, plotSheet, new Color(0, 0, 255));
+            FunctionDrawer ASHFunctionX = new FunctionDrawer(ashX, plotSheet, new ColorWrap(0, 0, 255));
             ASH ashY = new ASH(this.originX, mY, this.widthY, pointsOfAssignment[1]);
-            FunctionDrawer_y ASHFunctionY = new FunctionDrawer_y(ashY, plotSheet, new Color(0, 0, 255));
+            FunctionDrawer_y ASHFunctionY = new FunctionDrawer_y(ashY, plotSheet, new ColorWrap(0, 0, 255));
             histogramX.setOnFrame();
             histogramY.setOnFrame();
             KDEfunctionX.setOnFrame();
@@ -543,7 +543,7 @@ public class GlobalDataUnified extends Application {
             plotSheet.addDrawable(pointDrawer);
             if (this.hasLinearRegression) {
                 LinearRegression linearRegression = new LinearRegression(pointsOfAssignment, m, lambda);
-                FunctionDrawer linearRegressionFuncDraw = new FunctionDrawer(linearRegression, plotSheet, Color.cyan);
+                FunctionDrawer linearRegressionFuncDraw = new FunctionDrawer(linearRegression, plotSheet, ColorWrap.cyan);
                 linearRegressionFuncDraw.setSize(2.0f);
                 plotSheet.addDrawable(linearRegressionFuncDraw);
             }

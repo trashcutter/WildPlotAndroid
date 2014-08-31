@@ -1,4 +1,4 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

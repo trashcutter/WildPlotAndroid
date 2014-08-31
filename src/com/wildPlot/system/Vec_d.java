@@ -1,6 +1,6 @@
-package com.wildPlot.system;
+package com.wildplot.system;
 
-import com.wildPlot.MyMath.Vector_d;
+import com.wildplot.MyMath.Vector_d;
 
 public class Vec_d {
 	double[] v;							// array to hold the data of a vector

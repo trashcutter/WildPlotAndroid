@@ -1,10 +1,10 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import java.util.Vector;
 
 
-import com.wildPlot.MyMath.Matrix_d;
-import com.wildPlot.system.Vec_d;
+import com.wildplot.MyMath.Matrix_d;
+import com.wildplot.system.Vec_d;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;

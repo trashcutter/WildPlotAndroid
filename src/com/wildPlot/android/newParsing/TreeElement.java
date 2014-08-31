@@ -1,9 +1,9 @@
-package com.wildPlot.android.newParsing;
+package com.wildplot.android.newParsing;
 
 /**
  * Interface for Atom objects
  * @author Michael Goldbach
- * @see com.wildPlot.android.newParsing.Atom
+ * @see com.wildplot.android.newParsing.Atom
  */
 public interface TreeElement {
     public double getValue();

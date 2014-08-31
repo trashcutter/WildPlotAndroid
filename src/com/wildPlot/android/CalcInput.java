@@ -1,4 +1,4 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 public class CalcInput {
 	public String input = "";

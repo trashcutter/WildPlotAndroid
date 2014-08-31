@@ -1,10 +1,10 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import java.util.Vector;
 
 
-import com.wildPlot.system.*;
-import com.wildPlot.system.ODE.SOLVER;
+import com.wildplot.system.*;
+import com.wildplot.system.ODE.SOLVER;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;

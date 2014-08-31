@@ -1,19 +1,24 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
 
-import com.wildPlot.android.rendering.graphics.wrapper.BasicStroke;
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics2D;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.graphics.wrapper.Stroke;
-import com.wildPlot.android.rendering.interfaces.Drawable;
-import com.wildPlot.android.rendering.interfaces.Function2D;
-import com.wildPlot.android.rendering.interfaces.StepFunction2D;
-
-
+import com.wildplot.android.rendering.graphics.wrapper.*;
+import com.wildplot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.interfaces.Function2D;
+import com.wildplot.android.rendering.interfaces.StepFunction2D;
 
 
 /**
@@ -60,7 +65,7 @@ public class FunctionDrawer_y implements Drawable {
 	/**
 	 * the color of the function graph
 	 */
-	private Color color = new Color(255,0,0);
+	private ColorWrap color = new ColorWrap(255,0,0);
 
     private boolean isOnReset = false;
 
@@ -70,7 +75,7 @@ public class FunctionDrawer_y implements Drawable {
 	 * @param plotSheet the sheet the function will be drawn onto
 	 * @param color color of the function
 	 */
-	public FunctionDrawer_y(Function2D function, PlotSheet plotSheet, Color color) {
+	public FunctionDrawer_y(Function2D function, PlotSheet plotSheet, ColorWrap color) {
 		this.function = function;
 		this.plotSheet = plotSheet;
 		this.color = color;
@@ -82,7 +87,7 @@ public class FunctionDrawer_y implements Drawable {
 	 * @param plotSheet the sheet the function will be drawn onto
 	 * @param color color of the function
 	 */
-	public FunctionDrawer_y(Function2D function, PlotSheet plotSheet, Color color, double leftLimit, double rightLimit) {
+	public FunctionDrawer_y(Function2D function, PlotSheet plotSheet, ColorWrap color, double leftLimit, double rightLimit) {
 		this.function = function;
 		this.plotSheet = plotSheet;
 		this.color = color;
@@ -95,23 +100,23 @@ public class FunctionDrawer_y implements Drawable {
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
 	@Override
-	public void paint(Graphics g) {
+	public void paint(GraphicsWrap g) {
         isOnReset = false;
 		if(function instanceof StepFunction2D) {
 			this.isStepFunction = true;
 		}
-		 Graphics2D g2D = (Graphics2D) g;     
-		 Stroke oldStroke = g2D.getStroke();
-		    g2D.setStroke(new BasicStroke(this.size));  // set stroke width of 10
+		 StrokeWrap oldStroke = g.getStroke();
+		    g.setStroke(new BasicStrokeWrap(this.size));  // set stroke width of 10
 		 
-		Color oldColor = g.getColor();
-		Rectangle field = g.getClipBounds();
+		ColorWrap oldColor = g.getColor();
+		RectangleWrap field = g.getClipBounds();
 		g.setColor(color);
 		
 		
 		if(autoscale){
 			double[] start = this.plotSheet.toCoordinatePoint(0, 0, field);
-			double[] end = this.plotSheet.toCoordinatePoint(0+this.plotSheet.getFrameThickness(), 0, field);
+			double[] end = this.plotSheet.toCoordinatePoint(
+                    0+this.plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX], 0, field);
 			
 			this.scaleFactor = Math.abs(end[0] - start[0]);
 //			this.scaleFactor *= binSize;
@@ -124,22 +129,24 @@ public class FunctionDrawer_y implements Drawable {
 		
 		double[] drawingPoint = plotSheet.toCoordinatePoint(field.x,field.height,field);
 		if(this.isOnFrame)
-			drawingPoint = plotSheet.toCoordinatePoint(field.x,field.height-this.plotSheet.getFrameThickness(),field);
+			drawingPoint = plotSheet.toCoordinatePoint(field.x,
+                    field.height-this.plotSheet.getFrameThickness()[PlotSheet.BOTTOM_FRAME_THICKNESS_INDEX],field);
 		
 		double f_y = function.f(drawingPoint[1])*scaleFactor*extraScaleFactor;
 		double f_y_old = f_y;
-		
-		int[] coordStart = plotSheet.toGraphicPoint(f_y,drawingPoint[1],field);
+
+        float[] coordStart = plotSheet.toGraphicPoint(f_y,drawingPoint[1],field);
 		if(this.isOnFrame)
 			coordStart = plotSheet.toGraphicPoint(this.xOffset-f_y,drawingPoint[1],field);
-		
-		int[] coordEnd = coordStart;
-		
-		int leftStart = field.height+field.y;
-		int rightEnd = field.y;
+
+        float[] coordEnd = coordStart;
+
+        float leftStart = field.height+field.y;
+        float rightEnd = field.y;
 		if(this.isOnFrame){
-			leftStart = field.height+field.y-this.plotSheet.getFrameThickness();
-			rightEnd = field.y+this.plotSheet.getFrameThickness();
+			leftStart = field.height + field.y -
+                    this.plotSheet.getFrameThickness()[PlotSheet.BOTTOM_FRAME_THICKNESS_INDEX];
+			rightEnd = field.y+this.plotSheet.getFrameThickness()[PlotSheet.UPPER_FRAME_THICKNESS_INDEX];
 		}
 		
 		if(this.hasLimit){
@@ -147,7 +154,7 @@ public class FunctionDrawer_y implements Drawable {
 			rightEnd = plotSheet.yToGraphic(rightLimit, field);
 		}
 		
-		for(int i = leftStart; i> rightEnd; i--) {
+		for(int i = Math.round(leftStart); i> rightEnd; i--) {
             if(isOnReset)
                 return;
 
@@ -181,14 +188,14 @@ public class FunctionDrawer_y implements Drawable {
 			}
 			
 		}
-		g2D.setStroke(oldStroke);
+		g.setStroke(oldStroke);
 		g.setColor(oldColor);
 
 	}
 	
 	
 	public double getMaxValue(int pixelResolution){
-		Rectangle field = new Rectangle(pixelResolution, pixelResolution);
+		RectangleWrap field = new RectangleWrap(pixelResolution, pixelResolution);
 		double[] drawingPoint = plotSheet.toCoordinatePoint(field.x,0,field);
 		double max = Double.NEGATIVE_INFINITY;
 		

@@ -1,5 +1,5 @@
 /****************************************************************************************
- * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ * Copyright (c) 2014 Michael Goldbach <trashcutter@googlemail.com>                     *
  *                                                                                      *
  * This program is free software; you can redistribute it and/or modify it under        *
  * the terms of the GNU General Public License as published by the Free Software        *
@@ -15,16 +15,10 @@
  ****************************************************************************************/
 package com.wildplot.android.rendering.interfaces;
 
-/**
- * Interface for functions with one dependent variable
- */
-public interface Function2D {
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
 
-	/**
-	 * 
-	 * @param x given x value
-	 * @return calculated y value
-	 */
-	public double f(double x);
-
+public interface Legendable {
+    public ColorWrap getColor();
+    public String getName();
+    public boolean nameIsSet();
 }

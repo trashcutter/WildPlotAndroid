@@ -1,14 +1,26 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
+
+import com.wildplot.android.rendering.graphics.wrapper.FontMetricsWrap;
+import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildplot.android.rendering.interfaces.Drawable;
 
 import java.text.DecimalFormat;
-
-import com.wildPlot.android.rendering.graphics.wrapper.FontMetrics;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
 
 /**
  * This Class represents a Drawable x-axis 
@@ -16,6 +28,14 @@ import com.wildPlot.android.rendering.interfaces.Drawable;
  * 
  */
 public class YAxis implements Drawable {
+
+    private boolean mHasNumbersRotated = false;
+
+    private float maxTextWidth = 0;
+
+    private boolean isIntegerNumbering = false;
+
+    private boolean isOnRightSide = false;
 	
 	private boolean isLog = false;
 	
@@ -34,12 +54,15 @@ public class YAxis implements Drawable {
 	private double xOffset = 0;
 	
 	private String name = "Y";
+
+    private boolean mHasName = false;
 	
 	/**
 	 * Format that is used to print numbers under markers
 	 */
-	private DecimalFormat df =   new DecimalFormat( "##0.0#" );	
+	private DecimalFormat df =   new DecimalFormat( "##0.0#" );
 	private DecimalFormat dfScience =   new DecimalFormat( "0.0###E0" );
+    private DecimalFormat dfInteger =   new DecimalFormat( "#.#" );
 	
 	private boolean isScientific = false;
 	/**
@@ -65,12 +88,12 @@ public class YAxis implements Drawable {
 	/**
 	 * the estimated size between two mayor tics in auto tic mode
 	 */
-	private int pixelDistance = 25;
+	private float pixelDistance = 25;
 	
 	/**
 	 * the estimated size between two minor tics in auto tic mode
 	 */
-	private int minorPixelDistance = 25;
+	private float minorPixelDistance = 25;
 	
 	/**
 	 * start of drawn x-axis
@@ -95,15 +118,13 @@ public class YAxis implements Drawable {
 	/**
 	 * length of a marker in pixel, length is only for one side
 	 */
-	private int markerLength = 5;
+	private float markerLength = 5;
 	
 	private boolean isOnFrame = false;
 	
 	/**
 	 * Constructor for an Y-axis object
 	 * @param plotSheet the sheet the axis will be drawn onto
-	 * @param start the start of the y-axis before this value no axis will be drawn
-	 * @param end the end of the y-axis after this value no axis will be drawn
 	 * @param ticStart the start of the axis markers used for relative alignment of other markers
 	 * @param tic the space between two markers
 	 */
@@ -112,32 +133,28 @@ public class YAxis implements Drawable {
 		this.ticStart = ticStart;
 		this.tic = tic;
 		this.minorTic=minorTic;
-		this.pixelDistance = (int)Math.round((plotSheet.getyRange()[1] - plotSheet.getyRange()[0])/tic);
+		this.pixelDistance = (int) Math.round((plotSheet.getyRange()[1] - plotSheet.getyRange()[0]) / tic);
 	}
 	
 	/**
 	 * Constructor for an Y-axis object this instance uses autocalculation of tics with a given pixeldistance
 	 * @param plotSheet the sheet the axis will be drawn onto
-	 * @param start the start of the x-axis before this value no axis will be drawn
-	 * @param end the end of the x-axis after this value no axis will be drawn
 	 * @param ticStart the start of the axis markers used for relative alignment of other markers
 	 */
-	public YAxis(PlotSheet plotSheet, double ticStart, int pixelDistance , int minorPixelDistance) {
+	public YAxis(PlotSheet plotSheet, double ticStart, float pixelDistance , float minorPixelDistance) {
 		this.plotSheet = plotSheet;
 		this.ticStart = ticStart;
 		this.pixelDistance = pixelDistance;
 		this.minorPixelDistance = minorPixelDistance;
 		this.isAutoTic = true;
 	}
-	
-	
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
-	public void paint(Graphics g) {
-		Rectangle field = g.getClipBounds();
+	public void paint(GraphicsWrap g) {
+		RectangleWrap field = g.getClipBounds();
 		
 		if(this.hasVariableLimits){
 			start = plotSheet.getyRange()[0];
@@ -145,7 +162,7 @@ public class YAxis implements Drawable {
 		}
 		
 		if(this.isOnFrame)
-			xOffset = plotSheet.getxRange()[0];
+			//xOffset = plotSheet.getxRange()[0];
 		if(this.isAutoTic) {
 			this.tic = plotSheet.ticsCalcY(pixelDistance, field);
 			double quotient = (pixelDistance*1.0)/(minorPixelDistance*1.0);
@@ -159,8 +176,8 @@ public class YAxis implements Drawable {
 			this.isScientific = true;
 		
 		//vertikale Linie
-		int[] coordStart = plotSheet.toGraphicPoint(xOffset, start, field);
-		int[] coordEnd = plotSheet.toGraphicPoint(xOffset, end, field);
+        float[] coordStart = plotSheet.toGraphicPoint(xOffset, start, field);
+        float[] coordEnd = plotSheet.toGraphicPoint(xOffset, end, field);
 		
 		if(!this.isOnFrame)
 			g.drawLine(coordStart[0], coordStart[1], coordEnd[0], coordEnd[1]);
@@ -173,24 +190,22 @@ public class YAxis implements Drawable {
 	 * draw markers on the axis
 	 * @param g graphic object used for drawing
 	 */
-	private void drawMarkers(Graphics g) {
-		Rectangle field = g.getClipBounds();
-		
-		int cleanSpace = 17; // space in pixel that will be unmarked on the end of the axis for arrow and description
-		
-		int tics = (int)((this.ticStart - this.start)/tic);
+	private void drawMarkers(GraphicsWrap g) {
+		RectangleWrap field = g.getClipBounds();
+
+        float cleanSpace = 17; // space in pixel that will be unmarked on the end of the axis for arrow and description
+
+        float tics = (int)((this.ticStart - this.start)/tic);
 		double leftStart = this.ticStart - this.tic*tics; 
 		
 		double logStart = 0;
 		if(this.isLog) {
 			logStart = Math.ceil(Math.log10(this.start));
-			leftStart = Math.pow(10, logStart++); 
+			leftStart = Math.pow(10, logStart++);
 		}
-		
 		double currentY = leftStart;
 		
 		while(currentY <= this.end) {
-			
 			if((!this.isOnFrame &&plotSheet.yToGraphic(currentY, field) >= plotSheet.yToGraphic(this.end, field) +cleanSpace 
 					&& plotSheet.yToGraphic(currentY, field) <= plotSheet.yToGraphic(this.start, field) - cleanSpace
 					&& plotSheet.yToGraphic(currentY, field) <= field.y + field.height - cleanSpace
@@ -205,8 +220,10 @@ public class YAxis implements Drawable {
 					drawLeftMarker(g, field, currentY);
 				}
 				if(!(Math.abs(currentY) < yOffset+0.001 && !this.isOnFrame)) {
-					
-					drawNumbering(g, field, currentY);
+					if(isOnRightSide)
+                        drawNumberingOnRightSide(g,field,currentY);
+                    else
+					    drawNumbering(g, field, currentY);
 				} 
 			} 
 			if(this.isLog) {
@@ -215,15 +232,16 @@ public class YAxis implements Drawable {
 				currentY += this.tic;
 			}
 		}
-		FontMetrics fm = g.getFontMetrics( g.getFont() );
-		int width = fm.stringWidth(this.name);
+		FontMetricsWrap fm = g.getFontMetrics( g.getFont() );
+        float width = fm.stringWidth(this.name);
 		//arrow
-		
-		int[] arowheadPos = {plotSheet.xToGraphic(xOffset, field), (plotSheet.getyRange()[1] >= this.end)? plotSheet.yToGraphic( this.end, field): plotSheet.yToGraphic(plotSheet.getyRange()[1], field) };
+
+        float[] arowheadPos = {plotSheet.xToGraphic(xOffset, field), (plotSheet.getyRange()[1] >= this.end)? plotSheet.yToGraphic( this.end, field): plotSheet.yToGraphic(plotSheet.getyRange()[1], field) };
 		if(!this.isOnFrame) {
 			g.drawLine(arowheadPos[0]-1, arowheadPos[1]+1, arowheadPos[0]-3, arowheadPos[1]+6);
 			g.drawLine(arowheadPos[0]+1, arowheadPos[1]+1, arowheadPos[0]+3, arowheadPos[1]+6);
-			g.drawString(this.name, arowheadPos[0]-13-width, arowheadPos[1] + 10);
+            if(mHasName)
+			    g.drawString(this.name, arowheadPos[0]-13-width, arowheadPos[1] + 10);
 		} else {
 //			AffineTransform fontAT = new AffineTransform();
 //			Font oldFont = g.getFont();
@@ -231,17 +249,26 @@ public class YAxis implements Drawable {
 //			Font newFont = oldFont.deriveFont(fontAT);
 //			g.setFont(newFont);
 
-            g.save();
+            float spacerValue = maxTextWidth;
+            if(mHasNumbersRotated)
+                spacerValue = g.getFontMetrics().getHeight();
 
-			int[] middlePosition = {plotSheet.xToGraphic(xOffset, field), plotSheet.yToGraphic( 0, field) };
-            g.rotate(-90, middlePosition[0]-46, field.height/2+width/2);
-			g.drawString(this.name, middlePosition[0]-46, field.height/2+width/2);
+            g.save();
+            if(isOnRightSide) {
+                float[] middlePosition = {plotSheet.xToGraphic(xOffset, field), plotSheet.yToGraphic(0, field)};
+                g.rotate(90, middlePosition[0]+spacerValue*1.4f, field.height / 2 - width / 2);
+                if(mHasName)
+                    g.drawString(this.name, middlePosition[0]+spacerValue*1.4f, field.height / 2 - width / 2);
+            }else {
+                float[] middlePosition = {plotSheet.xToGraphic(xOffset, field), plotSheet.yToGraphic(0, field)};
+                g.rotate(-90, middlePosition[0]-spacerValue*1.4f, field.height / 2 + width / 2);
+                if(mHasName)
+                    g.drawString(this.name, middlePosition[0]-spacerValue*1.4f, field.height / 2 + width / 2);
+            }
             g.restore();
 //			g.setFont(oldFont);
 		}
-		
 		//axis name
-		
 	}
 	
 	/**
@@ -250,29 +277,74 @@ public class YAxis implements Drawable {
 	 * @param field bounds of plot
 	 * @param y position of number
 	 */
-	private void drawNumbering(Graphics g, Rectangle field, double y) {
+	private void drawNumbering(GraphicsWrap g, RectangleWrap field, double y) {
 		
-		if(this.tic < 1 && Math.abs(ticStart-y) < this.tic*this.tic)
+		if(this.tic < 1 && Math.abs(ticStart - y) < this.tic*this.tic)
 			y = ticStart;
-		
-		int[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
-		
-		
-		FontMetrics fm = g.getFontMetrics( g.getFont() );
 
+        float[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
+		
+		
+		FontMetricsWrap fm = g.getFontMetrics( g.getFont() );
+        float fontHeight = fm.getHeight(true);
 		String font = df.format(y);
-		int width = fm.stringWidth(font);
-		if(this.isScientific){
+        float width = fm.stringWidth(font);
+		if(this.isScientific && !isIntegerNumbering){
 			
 			font = dfScience.format(y);
 			width 		= fm.stringWidth(font);
-			g.drawString(font, coordStart[0]-width -7, coordStart[1]);
-		}else {
-			g.drawString(font, coordStart[0]-width-7, coordStart[1]);
-		}
+		}else if(isIntegerNumbering){
+            font = dfInteger.format(y);
+            width 		= fm.stringWidth(font);
+        }
+        g.save();
+        if(mHasNumbersRotated) {
+            float[] middlePosition = {plotSheet.xToGraphic(xOffset, field), plotSheet.yToGraphic(y, field)};
+            g.rotate(-90, middlePosition[0]-width*0.1f, middlePosition[1]+ width / 2.0f);
+            g.drawString(font, middlePosition[0]-width*0.1f, middlePosition[1]+ width / 2.0f );
+        }else
+            g.drawString(font, Math.round(coordStart[0] - width * 1.1f), Math.round(coordStart[1] + fontHeight * 0.4f) );
 
+        g.restore();
+        if(width > maxTextWidth)
+            maxTextWidth = width;
 		//g.drawString(df.format(y), coordStart[0]-33, coordStart[1]+4);
 	}
+
+    /**
+     * draw number left to a marker
+     * @param g graphic object used for drawing
+     * @param field bounds of plot
+     * @param y position of number
+     */
+    private void drawNumberingOnRightSide(GraphicsWrap g, RectangleWrap field, double y) {
+        if(this.tic < 1 && Math.abs(ticStart - y) < this.tic*this.tic)
+            y = ticStart;
+
+        float[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
+        FontMetricsWrap fm = g.getFontMetrics( g.getFont() );
+        float fontHeight = fm.getHeight(true);
+        String font = df.format(y);
+        float width = fm.stringWidth(font);
+        g.save();
+        if(this.isScientific && !isIntegerNumbering){
+            font = dfScience.format(y);
+            width = fm.stringWidth(font);
+        }else if(isIntegerNumbering){
+            font = dfInteger.format(y);
+            width = fm.stringWidth(font);
+        }
+        if(mHasNumbersRotated) {
+            float[] middlePosition = {plotSheet.xToGraphic(xOffset, field), plotSheet.yToGraphic(y, field)};
+            g.rotate(90, middlePosition[0]+width*0.1f, middlePosition[1]- width / 2.0f);
+            g.drawString(font, middlePosition[0]+width*0.1f, middlePosition[1]- width / 2.0f );
+        }else
+            g.drawString(font, Math.round(coordStart[0] + width * 0.1f), Math.round(coordStart[1] + fontHeight * 0.4f));
+        g.restore();
+        if(width > maxTextWidth)
+            maxTextWidth = width;
+        //g.drawString(df.format(y), coordStart[0]-33, coordStart[1]+4);
+    }
 	
 	/**
 	 * draws an left marker
@@ -280,10 +352,10 @@ public class YAxis implements Drawable {
 	 * @param field bounds of plot
 	 * @param y position of marker
 	 */
-	private void drawLeftMarker(Graphics g, Rectangle field, double y){
-		
-		int[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
-		int[] coordEnd = {coordStart[0] - this.markerLength, coordStart[1]};
+	private void drawLeftMarker(GraphicsWrap g, RectangleWrap field, double y){
+
+        float[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
+        float[] coordEnd = {coordStart[0] - this.markerLength, coordStart[1]};
 		g.drawLine(coordStart[0], coordStart[1], coordEnd[0], coordEnd[1]);
 		
 	}
@@ -293,9 +365,9 @@ public class YAxis implements Drawable {
 	 * @param field bounds of plot
 	 * @param y position of marker
 	 */
-	private void drawRightMarker(Graphics g, Rectangle field, double y){
-		int[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
-		int[] coordEnd = {coordStart[0] + this.markerLength, coordStart[1]};
+	private void drawRightMarker(GraphicsWrap g, RectangleWrap field, double y){
+        float[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
+        float[] coordEnd = {coordStart[0] + this.markerLength+1, coordStart[1]};
 		g.drawLine(coordStart[0], coordStart[1], coordEnd[0], coordEnd[1]);
 		
 	}
@@ -311,7 +383,7 @@ public class YAxis implements Drawable {
 
 	/**
 	 * set the offset of this axis
-	 * @param xOffset new offset
+	 * @param yOffset new offset
 	 */
 	public void setxOffset(double yOffset) {
 		this.xOffset = yOffset;
@@ -348,7 +420,16 @@ public class YAxis implements Drawable {
 		this.isOnFrame = false;
 		xOffset = 0;
 		markOnLeft = true;
+        markOnRight = true;
+        isOnRightSide = false;
 	}
+
+    public void setOnRightSideFrame() {
+        this.isOnFrame = true;
+        xOffset = plotSheet.getxRange()[1];
+        markOnRight = false;
+        isOnRightSide = true;
+    }
 	
 	/*
 	 * (non-Javadoc)
@@ -364,20 +445,24 @@ public class YAxis implements Drawable {
 	 */
 	public void setName(String name) {
 		this.name = name;
+        if(name.equals(""))
+            mHasName = false;
+        else
+            mHasName = true;
 	}
-	private void drawMinorMarkers(Graphics g) {
-		Rectangle field = g.getClipBounds();
+	private void drawMinorMarkers(GraphicsWrap g) {
+		RectangleWrap field = g.getClipBounds();
 		
 		int cleanSpace = 17; // space in pixel that will be unmarked on the end of the axis for arrow and description
 		
 		int tics = (int)((this.ticStart - this.start)/tic);
-		double leftStart = this.ticStart - this.tic*tics; 
-		
-		int factor = 1;
+		double leftStart = this.ticStart - this.tic*tics;
+
+        int factor = 1;
 		double logStart = 0;
 		if(this.isLog) {
 			logStart = Math.floor(Math.log10(this.start));
-			leftStart = Math.pow(10, logStart) * factor++; 
+			leftStart = Math.pow(10, logStart) * factor++;
 		}
 		
 		double currentY = leftStart;
@@ -430,10 +515,10 @@ public class YAxis implements Drawable {
 	 * @param field bounds of plot
 	 * @param y position of marker
 	 */
-	private void drawLeftMinorMarker(Graphics g, Rectangle field, double y){
-		
-		int[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
-		int[] coordEnd = {(int) (coordStart[0] - 0.5*this.markerLength), coordStart[1]};
+	private void drawLeftMinorMarker(GraphicsWrap g, RectangleWrap field, double y){
+
+        float[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
+        float[] coordEnd = {(float) (coordStart[0] - 0.5*this.markerLength), coordStart[1]};
 		g.drawLine(coordStart[0], coordStart[1], coordEnd[0], coordEnd[1]);
 		
 	}
@@ -443,13 +528,16 @@ public class YAxis implements Drawable {
 	 * @param field bounds of plot
 	 * @param y position of marker
 	 */
-	private void drawRightMinorMarker(Graphics g, Rectangle field, double y){
-		int[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
-		int[] coordEnd = {(int) (coordStart[0] + 0.5*this.markerLength), coordStart[1]};
+	private void drawRightMinorMarker(GraphicsWrap g, RectangleWrap field, double y){
+        float[] coordStart = plotSheet.toGraphicPoint(xOffset, y, field);
+        float[] coordEnd = {(float) (coordStart[0] + 0.5*this.markerLength+1), coordStart[1]};
 		g.drawLine(coordStart[0], coordStart[1], coordEnd[0], coordEnd[1]);
 		
 	}
-	
+
+    public void setIntegerNumbering(boolean isIntegerNumbering){
+        this.isIntegerNumbering = isIntegerNumbering;
+    }
 	public void setLog(){
 		this.isLog = true;
 	}
@@ -471,5 +559,12 @@ public class YAxis implements Drawable {
     @Override
     public boolean isCritical() {
         return true;
+    }
+
+    public void setHasNumbersRotated(){
+        mHasNumbersRotated = true;
+    }
+    public  void unsetHasNumbersRotated(){
+        mHasNumbersRotated = false;
     }
 }

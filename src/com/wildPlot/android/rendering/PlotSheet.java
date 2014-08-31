@@ -1,18 +1,31 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
 
 
+import android.graphics.Typeface;
+import android.util.Log;
+import com.ichi2.anki.AnkiDroidApp;
+import com.wildplot.android.rendering.graphics.wrapper.*;
+import com.wildplot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.interfaces.Legendable;
+
+import java.util.HashMap;
+import java.util.Set;
 import java.util.Vector;
-
-import com.wildPlot.android.rendering.graphics.wrapper.BufferedImage;
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.FontMetrics;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics2D;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
 
 
 /**
@@ -21,9 +34,13 @@ import com.wildPlot.android.rendering.interfaces.Drawable;
  */
 public class PlotSheet implements Drawable {
 	protected boolean isLogX = false;
+    protected Typeface typeface = Typeface.DEFAULT;
 
     protected boolean isLogY = false;
     protected boolean hasTitle = false;
+
+    protected float fontSize = 10f;
+    protected boolean fontSizeSet = false;
 	
 	/**
 	 * title of plotSheet
@@ -38,7 +55,15 @@ public class PlotSheet implements Drawable {
 	/**
 	 * thickness of frame in pixel
 	 */
-    protected int frameThickness = 0;
+    protected float leftFrameThickness = 0;
+    protected float upperFrameThickness = 0;
+    protected float rightFrameThickness = 0;
+    protected float bottomFrameThickness = 0;
+
+    public static final int LEFT_FRAME_THICKNESS_INDEX = 0;
+    public static final int RIGHT_FRAME_THICKNESS_INDEX = 1;
+    public static final int UPPER_FRAME_THICKNESS_INDEX = 2;
+    public static final int BOTTOM_FRAME_THICKNESS_INDEX = 3;
 	
 	/**
 	 * states if there is a border between frame and plot
@@ -48,7 +73,7 @@ public class PlotSheet implements Drawable {
 	/**
 	 * thickness of border in pixel, until now more than 1 may bring problems for axis drawing
 	 */
-    protected int borderThickness = 1;
+    protected float borderThickness = 1;
 	
 	//if class shold be made threadable for mulitplot mode, than
 	//this must be done otherwise
@@ -61,8 +86,10 @@ public class PlotSheet implements Drawable {
 	 * the ploting screens, screen 0 is the only one in single mode
 	 */
 	Vector<MultiScreenPart> screenParts = new Vector<MultiScreenPart>();
-	
-	/**
+    private HashMap<String, ColorWrap> mLegendMap = new HashMap<String, ColorWrap>();
+    private boolean mDrawablesPrepared = false;
+
+    /**
 	 * Create a virtual sheet used for the plot
 	 * @param xStart the start of the x-range
 	 * @param xEnd the end of the x-range
@@ -119,6 +146,7 @@ public class PlotSheet implements Drawable {
 	 */
 	public void addDrawable(Drawable draw) {
 		this.screenParts.get(0).addDrawable(draw);
+        mDrawablesPrepared = false;
 	}
 	
 
@@ -129,20 +157,25 @@ public class PlotSheet implements Drawable {
 	 * @return the converted x value
 	 */
 	@Deprecated
-	public int xToGraphic(double x, Rectangle field) {
+	public float xToGraphic(double x, RectangleWrap field) {
 
 		return (this.isLogX)?xToGraphicLog(x,field):xToGraphicLinear(x,field);
 	}
-	private int xToGraphicLinear(double x, Rectangle field) {
-		double xQuotient = (field.width - 2*frameThickness) / (Math.abs(this.screenParts.get(currentScreen).getxRange()[1] - this.screenParts.get(currentScreen).getxRange()[0]));
+	private float xToGraphicLinear(double x, RectangleWrap field) {
+		double xQuotient = (field.width - leftFrameThickness -rightFrameThickness) /
+                (Math.abs(this.screenParts.get(currentScreen).getxRange()[1] -
+                        this.screenParts.get(currentScreen).getxRange()[0]));
 		double xDistanceFromLeft = x - this.screenParts.get(currentScreen).getxRange()[0];
 		
-		return field.x + frameThickness + (int)Math.round(xDistanceFromLeft * xQuotient);
+		return field.x + leftFrameThickness + (float)(xDistanceFromLeft * xQuotient);
 	}
-	private int xToGraphicLog(double x, Rectangle field) {
-		double range = Math.log10(this.screenParts.get(currentScreen).getxRange()[1]) - Math.log10(this.screenParts.get(currentScreen).getxRange()[0]);
-		
-		return (int) Math.round(field.x + this.frameThickness + (Math.log10(x) - Math.log10(this.screenParts.get(currentScreen).getxRange()[0]))/(range) * (field.width - 2*frameThickness));
+	private float xToGraphicLog(double x, RectangleWrap field) {
+		double range = Math.log10(this.screenParts.get(currentScreen).getxRange()[1]) -
+                Math.log10(this.screenParts.get(currentScreen).getxRange()[0]);
+
+		return (float) (field.x + this.leftFrameThickness + (Math.log10(x) -
+                Math.log10(this.screenParts.get(currentScreen).getxRange()[0]))/(range) *
+                (field.width - leftFrameThickness - rightFrameThickness));
 	}
 	
 	/**
@@ -153,21 +186,28 @@ public class PlotSheet implements Drawable {
 	 * @return the converted y value
 	 */
 	@Deprecated
-	public int yToGraphic(double y, Rectangle field) {
+	public float yToGraphic(double y, RectangleWrap field) {
 		return (this.isLogY)?yToGraphicLog(y,field):yToGraphicLinear(y,field);
 	}
 	
 	
-	private int yToGraphicLinear(double y, Rectangle field) {
-		double yQuotient = (field.height -2*frameThickness) / (Math.abs(this.screenParts.get(currentScreen).getyRange()[1] - this.screenParts.get(currentScreen).getyRange()[0]));
+	private float yToGraphicLinear(double y, RectangleWrap field) {
+		double yQuotient = (field.height - upperFrameThickness - bottomFrameThickness) /
+                (Math.abs(this.screenParts.get(currentScreen).getyRange()[1] -
+                        this.screenParts.get(currentScreen).getyRange()[0]));
+
 		double yDistanceFromTop = this.screenParts.get(currentScreen).getyRange()[1] - y;
 		
-		return field.y + frameThickness + (int)Math.round(yDistanceFromTop * yQuotient);
+		return (float)(field.y + upperFrameThickness + yDistanceFromTop * yQuotient);
 	}
-	private int yToGraphicLog(double y, Rectangle field) {
+	private float yToGraphicLog(double y, RectangleWrap field) {
 		
 		
-		return (int) Math.round((((Math.log10(y)-Math.log10(this.screenParts.get(currentScreen).getyRange()[0]))/(Math.log10(this.screenParts.get(currentScreen).getyRange()[1]) - Math.log10(this.screenParts.get(currentScreen).getyRange()[0]))) *(field.height-2*this.frameThickness) - (field.height-2*this.frameThickness))*(-1) + this.frameThickness   );
+		return (float) (((Math.log10(y)- Math.log10(this.screenParts.get(currentScreen).getyRange()[0]))/
+                (Math.log10(this.screenParts.get(currentScreen).getyRange()[1]) -
+                        Math.log10(this.screenParts.get(currentScreen).getyRange()[0])))
+                *(field.height - upperFrameThickness - bottomFrameThickness) -
+                (field.height-upperFrameThickness - bottomFrameThickness))*(-1) + upperFrameThickness;
 	}
 	
 	/**
@@ -177,8 +217,8 @@ public class PlotSheet implements Drawable {
 	 * @param field clipping bounds for drawing
 	 * @return the point in graphical coordinates
 	 */
-	public int[] toGraphicPoint(double x, double y, Rectangle field) {
-		int[] graphicPoint = {xToGraphic(x, field), yToGraphic(y, field)};
+	public float[] toGraphicPoint(double x, double y, RectangleWrap field) {
+        float[] graphicPoint = {xToGraphic(x, field), yToGraphic(y, field)};
 		return graphicPoint;
 	}
 	
@@ -191,23 +231,28 @@ public class PlotSheet implements Drawable {
 	 * @return x-coordinate in plotting coordinate system
 	 */
 	@Deprecated
-	public double xToCoordinate(int x, Rectangle field) {
+	public double xToCoordinate(float x, RectangleWrap field) {
 		
 		
 		return (this.isLogX)?xToCoordinateLog(x,field):xToCoordinateLinear(x,field);
 	}
 	
-	private double xToCoordinateLinear(int x, Rectangle field) {
-		double xQuotient = (Math.abs(this.screenParts.get(currentScreen).getxRange()[1] - this.screenParts.get(currentScreen).getxRange()[0])) / (field.width-2*frameThickness);
-		double xDistanceFromLeft = field.x - frameThickness + x;
+	private double xToCoordinateLinear(float x, RectangleWrap field) {
+		double xQuotient = (Math.abs(this.screenParts.get(currentScreen).getxRange()[1] -
+                this.screenParts.get(currentScreen).getxRange()[0])) /
+                (field.width- leftFrameThickness - rightFrameThickness);
+		double xDistanceFromLeft = field.x - leftFrameThickness + x;
 		
 		return this.screenParts.get(currentScreen).getxRange()[0] + xDistanceFromLeft*xQuotient;
 	}
 	
-	private double xToCoordinateLog(int x, Rectangle field) {
-		double range = Math.log10(this.screenParts.get(currentScreen).getxRange()[1]) - Math.log10(this.screenParts.get(currentScreen).getxRange()[0]);
+	private double xToCoordinateLog(float x, RectangleWrap field) {
+		double range = Math.log10(this.screenParts.get(currentScreen).getxRange()[1]) -
+                Math.log10(this.screenParts.get(currentScreen).getxRange()[0]);
 		
-		return Math.pow(10, ((x- (field.x + this.frameThickness))*1.0*(range) )/(field.width - 2.0*frameThickness) + Math.log10(this.screenParts.get(currentScreen).getxRange()[0]) ) ;
+		return Math.pow(10, ((x - (field.x + leftFrameThickness)) * 1.0 * (range)) /
+                (field.width - leftFrameThickness - rightFrameThickness) +
+                Math.log10(this.screenParts.get(currentScreen).getxRange()[0])) ;
 	}
 	
 	
@@ -220,22 +265,29 @@ public class PlotSheet implements Drawable {
 	 * @return y-coordinate in plotting coordinate system
 	 */
 	@Deprecated
-	public double yToCoordinate(int y, Rectangle field) {
+	public double yToCoordinate(float y, RectangleWrap field) {
 		
 		
 		return (this.isLogY)?yToCoordinateLog(y, field):yToCoordinateLinear(y, field);
 	}
 	
-	public double yToCoordinateLinear(int y, Rectangle field) {
-		double yQuotient = (Math.abs(this.screenParts.get(currentScreen).getyRange()[1] - this.screenParts.get(currentScreen).getyRange()[0])) / (field.height -2*frameThickness);
-		double yDistanceFromBottom = field.y + field.height - 1 - y -frameThickness;
+	public double yToCoordinateLinear(float y, RectangleWrap field) {
+		double yQuotient = (Math.abs(this.screenParts.get(currentScreen).getyRange()[1] -
+                this.screenParts.get(currentScreen).getyRange()[0])) /
+                (field.height -upperFrameThickness -bottomFrameThickness);
+		double yDistanceFromBottom = field.y + field.height - 1 - y -bottomFrameThickness;
 		
 		return this.screenParts.get(currentScreen).getyRange()[0] + yDistanceFromBottom*yQuotient;
 	}
 	
-	public double yToCoordinateLog(int y, Rectangle field) {
+	public double yToCoordinateLog(float y, RectangleWrap field) {
 
-		return Math.pow(10, ((y - this.frameThickness + (field.height-2*this.frameThickness))*(-1))/((field.height-2*this.frameThickness))*((Math.log10(this.screenParts.get(currentScreen).getyRange()[1]) - Math.log10(this.screenParts.get(currentScreen).getyRange()[0]))) +Math.log10(this.screenParts.get(currentScreen).getyRange()[0]));
+		return Math.pow(10,
+                ((y - upperFrameThickness + (field.height - upperFrameThickness - bottomFrameThickness)) * (-1)) /
+                        ((field.height - upperFrameThickness - bottomFrameThickness)) *
+                        ((Math.log10(this.screenParts.get(currentScreen).getyRange()[1]) -
+                                Math.log10(this.screenParts.get(currentScreen).getyRange()[0]))) +
+                        Math.log10(this.screenParts.get(currentScreen).getyRange()[0]));
 	}
 	
 	/**
@@ -245,7 +297,7 @@ public class PlotSheet implements Drawable {
 	 * @param field clipping bounds for drawing
 	 * @return the point in plotting coordinates
 	 */
-	public double[] toCoordinatePoint(int x, int y, Rectangle field) {
+	public double[] toCoordinatePoint(float x, float y, RectangleWrap field) {
 		double[] coordinatePoint = {xToCoordinate(x, field), yToCoordinate(y, field)};
 		
 		return coordinatePoint;
@@ -255,7 +307,7 @@ public class PlotSheet implements Drawable {
 	 * (non-Javadoc)
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
-	public void paint(Graphics g) {
+	public void paint(GraphicsWrap g) {
 		//TODO insets
 		if(this.isMultiMode) {
 			drawMultiMode(g);			
@@ -264,106 +316,220 @@ public class PlotSheet implements Drawable {
 		}
 	}
 	
-	private void drawMultiMode(Graphics g) {
+	private void drawMultiMode(GraphicsWrap g) {
 		//TODO
 	}
 	
-	private void drawSingleMode(Graphics g, int screenNr) {
-		Rectangle field = g.getClipBounds();
+	private void drawSingleMode(GraphicsWrap g, int screenNr) {
+        RectangleWrap field = g.getClipBounds();
 		this.currentScreen = screenNr;
-		
-		Vector<DrawableDrawingRunnable> offFrameDrawables = new Vector<DrawableDrawingRunnable>();
-		Vector<DrawableDrawingRunnable> onFrameDrawables = new Vector<DrawableDrawingRunnable>();
-		BufferedImage bufferedFrameImage = new BufferedImage(field.width, field.height, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D gFrame = bufferedFrameImage.createGraphics();
-		gFrame.setClip(field);
-		gFrame.setColor(Color.BLACK);
-		Thread[] threads = new Thread[this.screenParts.get(screenNr).getDrawables().size()]; 
+        prepareDrawables();
+		Vector<Drawable> offFrameDrawables = new Vector<Drawable>();
+		Vector<Drawable> onFrameDrawables = new Vector<Drawable>();
+
+
+        g.setTypeface(typeface);
+        g.setColor(ColorWrap.white);
+        g.fillRect(0, 0, field.width, field.height);
+        g.setColor(ColorWrap.BLACK);
+
+
+        if(fontSizeSet) {
+            g.setFontSize(fontSize);
+        }
 		int i = 0;
 		
-		if(this.screenParts.get(screenNr).getDrawables() != null && this.screenParts.get(screenNr).getDrawables().size() != 0) {
+		if(this.screenParts.get(screenNr).getDrawables() != null &&
+                this.screenParts.get(screenNr).getDrawables().size() != 0) {
 			for(Drawable draw : this.screenParts.get(screenNr).getDrawables()) {
-				DrawableDrawingRunnable drawableDrawingRunnable = new DrawableDrawingRunnable(draw, field);
-				threads[i] = new Thread( drawableDrawingRunnable);
-				threads[i++].start();
 				if(!draw.isOnFrame()) {
-					offFrameDrawables.add(drawableDrawingRunnable);
+					offFrameDrawables.add(draw);
 				} else {
-					onFrameDrawables.add(drawableDrawingRunnable);
+					onFrameDrawables.add(draw);
 				}
 			}
 		}
-		
-		//DEBUG
-		System.err.println("Frame: "+ field.width + " : " + field.height);
-		//END DEBUG
-		
-		
+
+        for(Drawable offFrameDrawing : offFrameDrawables){
+            offFrameDrawing.paint(g);
+
+        }
+
 		//paint white frame to over paint everything that was drawn over the border 
-		Color oldColor = gFrame.getColor();
-		if(this.frameThickness>0){
-			gFrame.setColor(Color.white);
+		ColorWrap oldColor = g.getColor();
+		if(leftFrameThickness>0 || rightFrameThickness > 0 || upperFrameThickness > 0 || bottomFrameThickness > 0){
+            g.setColor(ColorWrap.white);
 			//upper frame
-			gFrame.fillRect(0, 0, field.width, this.frameThickness);
+            g.fillRect(0, 0, field.width, upperFrameThickness);
 
 			//left frame
-			gFrame.fillRect(0, this.frameThickness, this.frameThickness, field.height);
+            g.fillRect(0, upperFrameThickness, leftFrameThickness, field.height);
 			
 			//right frame
-			gFrame.fillRect(field.width+1-this.frameThickness, this.frameThickness,this.frameThickness+2, field.height-this.frameThickness);
+            g.fillRect(field.width+1-rightFrameThickness, upperFrameThickness,rightFrameThickness +
+                    leftFrameThickness, field.height-bottomFrameThickness);
 			
 			//bottom frame
 			//gFrame.setColor(Color.RED); //DEBUG
-			gFrame.fillRect(this.frameThickness, field.height-this.frameThickness, field.width-this.frameThickness,this.frameThickness+1);
+            g.fillRect(leftFrameThickness, field.height-bottomFrameThickness,
+                    field.width-rightFrameThickness,bottomFrameThickness+1);
 			
 			//make small black border frame
 			if(isBordered){
-				gFrame.setColor(Color.black);
+                g.setColor(ColorWrap.black);
 				//upper border
-				gFrame.fillRect(this.frameThickness-borderThickness+1, this.frameThickness-borderThickness+1, field.width-2*this.frameThickness+2*borderThickness-2, borderThickness);
+                g.fillRect(leftFrameThickness-borderThickness+1, upperFrameThickness-borderThickness+1,
+                        field.width-leftFrameThickness - rightFrameThickness +2*borderThickness-2, borderThickness);
 				
 				//lower border
-				gFrame.fillRect(this.frameThickness-borderThickness+1, field.height-this.frameThickness, field.width-2*this.frameThickness+2*borderThickness-2, borderThickness);
+                g.fillRect(leftFrameThickness-borderThickness+1, field.height-bottomFrameThickness,
+                        field.width-leftFrameThickness -rightFrameThickness+2*borderThickness-2, borderThickness);
 				
 				//left border
-				gFrame.fillRect(this.frameThickness-borderThickness+1, this.frameThickness-borderThickness+1, borderThickness, field.height-2*this.frameThickness+2*borderThickness-2);
+                g.fillRect(leftFrameThickness-borderThickness+1, upperFrameThickness-borderThickness+1,
+                        borderThickness, field.height-upperFrameThickness - bottomFrameThickness+2*borderThickness-2);
 				
 				//right border
-				gFrame.fillRect(field.width-this.frameThickness, this.frameThickness-borderThickness+1, borderThickness, field.height-2*this.frameThickness+2*borderThickness-2);
+                g.fillRect(field.width-rightFrameThickness, upperFrameThickness-borderThickness+1,
+                        borderThickness, field.height-upperFrameThickness - bottomFrameThickness +2*borderThickness-2);
 				
 			}
-			
-			gFrame.setColor(oldColor);
+
+            g.setColor(oldColor);
 			
 //			Font oldFont = gFrame.getFont();
 //			gFrame.setFont(oldFont.deriveFont(20.0f));
-			FontMetrics fm = gFrame.getFontMetrics();
-			int height = fm.getHeight();
-			
-			int width = fm.stringWidth(this.title);
-			gFrame.drawString(this.title, field.width/2 -width/2, this.frameThickness - 10 - height);
+            if(hasTitle) {
+                float oldFontSize = g.getFontSize();
+                float newFontSize = oldFontSize * 2;
+                g.setFontSize(newFontSize);
+                FontMetricsWrap fm = g.getFontMetrics();
+                float height = fm.getHeight();
+
+                float width = fm.stringWidth(this.title);
+                g.drawString(this.title, field.width / 2 - width / 2, upperFrameThickness - 10 - height);
+                g.setFontSize(oldFontSize);
+            }
+
+            Set<String> keySet = mLegendMap.keySet();
+
+            float oldFontSize = g.getFontSize();
+            g.setFontSize(oldFontSize* 0.9f);
+            FontMetricsWrap fm = g.getFontMetrics();
+            float height = fm.getHeight();
+            float spacerValue = height * 0.5f;
+            float xPointer = spacerValue;
+            float ySpacer = spacerValue;
+            float rectangleSize = height;
+
+            float currentPixelWidth = xPointer;
+
+            int legendCnt = 0;
+            Log.d(AnkiDroidApp.TAG, "should draw legend now, number of legend entries: " + mLegendMap.size());
+            for(String legendName : keySet){
+
+                float stringWidth = fm.stringWidth(" : "+legendName);
+
+                float delta = rectangleSize - height;
+                ColorWrap color = mLegendMap.get(legendName);
+                g.setColor(color);
+
+                if(legendCnt++ != 0 && xPointer + rectangleSize*2.0f + stringWidth >= field.width){
+                    xPointer = spacerValue;
+                    ySpacer += rectangleSize + spacerValue;
+                }
+                g.fillRect(xPointer, ySpacer, rectangleSize, rectangleSize);
+                g.setColor(ColorWrap.BLACK);
+                g.drawString(" : "+legendName, xPointer + rectangleSize , ySpacer+rectangleSize);
+                xPointer += rectangleSize*1.3f + stringWidth;
+                Log.d(AnkiDroidApp.TAG, "drawing a legend Item: (" + legendName + ") " + (legendCnt - 1) + ", x: " + (xPointer + rectangleSize) + ", y: " + (ySpacer + rectangleSize));
+
+            }
+            g.setFontSize(oldFontSize);
+            g.setColor(ColorWrap.BLACK);
 //			gFrame.setFont(oldFont);
 		}
-		gFrame.dispose();
-		
-		for(i=0; i<threads.length; i++ ){
-			try {
-				threads[i].join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
-		for(DrawableDrawingRunnable offFrameDrawing : offFrameDrawables){
-			((Graphics2D)g).drawImage(offFrameDrawing.getBufferedDrawableImage(), null, 0, 0);
-		}
-		((Graphics2D)g).drawImage(bufferedFrameImage, null, 0, 0);
-		for(DrawableDrawingRunnable onFrameDrawing : onFrameDrawables){
-			((Graphics2D)g).drawImage(onFrameDrawing.getBufferedDrawableImage(), null, 0, 0);
+
+		for(Drawable onFrameDrawing : onFrameDrawables){
+			onFrameDrawing.paint(g);
 		}
 		
 	}
+
+
+    /**
+     *sort runnables and group them together to use lesser threads
+     */
+    private void prepareDrawables(){
+
+        if(!mDrawablesPrepared) {
+            mDrawablesPrepared = true;
+            Vector<Drawable> drawables = this.screenParts.get(0).getDrawables();
+            Vector<Drawable> onFrameDrawables = new Vector<Drawable>();
+            Vector<Drawable> offFrameDrawables = new Vector<Drawable>();
+
+            DrawableContainer onFrameContainer = new DrawableContainer(true, false);
+
+            DrawableContainer offFrameContainer = new DrawableContainer(false, false);
+            for (Drawable drawable : drawables) {
+                if (drawable instanceof Legendable && ((Legendable) drawable).nameIsSet()) {
+                    ColorWrap color = ((Legendable) drawable).getColor();
+                    String name = ((Legendable) drawable).getName();
+                    mLegendMap.put(name, color);
+                }
+                if (drawable.isOnFrame()) {
+                    if (drawable.isClusterable()) {
+                        if (onFrameContainer.isCritical() == drawable.isCritical()) {
+                            onFrameContainer.addDrawable(drawable);
+                        } else {
+                            if (onFrameContainer.getSize() > 0) {
+                                onFrameDrawables.add(onFrameContainer);
+                            }
+                            onFrameContainer = new DrawableContainer(true, drawable.isCritical());
+                            onFrameContainer.addDrawable(drawable);
+                        }
+                    } else {
+                        if (onFrameContainer.getSize() > 0) {
+                            onFrameDrawables.add(onFrameContainer);
+                        }
+                        onFrameDrawables.add(drawable);
+                        onFrameContainer = new DrawableContainer(true, false);
+
+                    }
+                } else {
+                    if (drawable.isClusterable()) {
+                        if (offFrameContainer.isCritical() == drawable.isCritical()) {
+                            offFrameContainer.addDrawable(drawable);
+                        } else {
+                            if (offFrameContainer.getSize() > 0) {
+                                offFrameDrawables.add(offFrameContainer);
+                            }
+                            offFrameContainer = new DrawableContainer(false, drawable.isCritical());
+                            offFrameContainer.addDrawable(drawable);
+                        }
+                    } else {
+                        if (offFrameContainer.getSize() > 0) {
+                            offFrameDrawables.add(offFrameContainer);
+                        }
+                        offFrameDrawables.add(drawable);
+                        offFrameContainer = new DrawableContainer(false, false);
+                    }
+                }
+            }
+            if (onFrameContainer.getSize() > 0) {
+                onFrameDrawables.add(onFrameContainer);
+            }
+
+            if (offFrameContainer.getSize() > 0) {
+                offFrameDrawables.add(offFrameContainer);
+            }
+
+            this.screenParts.get(0).getDrawables().removeAllElements();
+            this.screenParts.get(0).getDrawables().addAll(offFrameDrawables);
+            this.screenParts.get(0).getDrawables().addAll(onFrameDrawables);
+
+        }
+    }
 	
 	/**
 	 * the x-range for the plot
@@ -399,29 +565,31 @@ public class PlotSheet implements Drawable {
 	
 	/**
 	 * returns the size in pixel of the outer frame
-	 * @return the size of the outer frame in pixel
+	 * @return the size of the outer frame for left, right, upper and bottom frame
 	 */
-	public int getFrameThickness() {
-		return (isMultiMode)? 0:frameThickness;
+	public float[] getFrameThickness() {
+		return new float[]{leftFrameThickness, rightFrameThickness, upperFrameThickness, bottomFrameThickness};
 	}
 	
 	/**
 	 * set the size of the outer frame in pixel
-	 * @param frameThickness new size for the outer frame in pixel
 	 */
-	public void setFrameThickness(int frameThickness) {
-		if(frameThickness < 0){
+	public void setFrameThickness(float leftFrameThickness, float rightFrameThickness, float upperFrameThickness, float bottomFrameThickness) {
+		if(leftFrameThickness < 0 ||rightFrameThickness < 0 || upperFrameThickness < 0 || bottomFrameThickness < 0){
 			System.err.println("PlotSheet:Error::Wrong Frame size (smaller than 0)");
 			System.exit(-1);
 		}
-		this.frameThickness = frameThickness;
+		this.leftFrameThickness = leftFrameThickness;
+        this.rightFrameThickness = rightFrameThickness;
+        this.upperFrameThickness = upperFrameThickness;
+        this.bottomFrameThickness = bottomFrameThickness;
 	}
 	
 	/**
 	 * sets the size of the border between plot and outer frame in pixel
 	 * @param borderThickness size of border in pixel
 	 */
-	public void setBorderThickness(int borderThickness) {
+	public void setBorderThickness(float borderThickness) {
 		this.borderThickness = borderThickness;
 		this.isBordered = true;
 	}
@@ -454,10 +622,10 @@ public class PlotSheet implements Drawable {
 	 * @param field
 	 * @return
 	 */
-	public double ticsCalcX(int pixelDistance, Rectangle field){
+	public double ticsCalcX(float pixelDistance, RectangleWrap field){
 		double deltaRange = this.screenParts.get(currentScreen).getxRange()[1] - this.screenParts.get(currentScreen).getxRange()[0];
-		int ticlimit = field.width/pixelDistance;
-		double tics = Math.pow(10, (int)Math.log10(deltaRange/ticlimit));
+        float ticlimit = field.width/pixelDistance;
+		double tics = Math.pow(10, (int) Math.log10(deltaRange / ticlimit));
 		while(2.0*(deltaRange/(tics)) <= ticlimit) {
 			tics /= 2.0;
 		}
@@ -472,16 +640,17 @@ public class PlotSheet implements Drawable {
 	 * @param field
 	 * @return
 	 */
-	public double ticsCalcY(int pixelDistance, Rectangle field){
+	public double ticsCalcY(float pixelDistance, RectangleWrap field){
 		double deltaRange = this.screenParts.get(currentScreen).getyRange()[1] - this.screenParts.get(currentScreen).getyRange()[0];
-		int ticlimit = field.height/pixelDistance;
-		double tics = Math.pow(10, (int)Math.log10(deltaRange/ticlimit));
+        float ticlimit = field.height/pixelDistance;
+		double tics = Math.pow(10, (int) Math.log10(deltaRange / ticlimit));
 		while(2.0*(deltaRange/(tics)) <= ticlimit) {
 			tics /= 2.0;
 		}
 		while((deltaRange/(tics))/2 >= ticlimit) {
 			tics *= 2.0;
 		}
+        Log.d(AnkiDroidApp.TAG, "PlotSheet ticksCalcY: pixelDistance: " + pixelDistance + ", ticks: " + tics);
 		return tics;
 	}
 	
@@ -516,41 +685,8 @@ public class PlotSheet implements Drawable {
 	public void unsetLogY() {
 		this.isLogY = false;
 	}
-	
-	private class DrawableDrawingRunnable implements Runnable {
-		
-		private Drawable drawable;
-		
-		private BufferedImage bufferedDrawableImage;
-		private Rectangle field;
-
-		public DrawableDrawingRunnable(Drawable drawable, Rectangle field) {
-			super();
-			this.drawable = drawable;
-			this.field = field;
-			bufferedDrawableImage = new BufferedImage(field.width, field.height, BufferedImage.TYPE_INT_ARGB);
-			
-		}
 
 
-		@Override
-		public void run() {
-			Graphics2D g = bufferedDrawableImage.createGraphics();
-			g.setClip(field);
-			g.setColor(Color.BLACK);
-			drawable.paint(g);
-			g.dispose();
-			
-		}
-
-
-		public BufferedImage getBufferedDrawableImage() {
-			return bufferedDrawableImage;
-		}
-		
-		
-		
-	}
 
 	@Override
 	public void abortAndReset() {
@@ -566,5 +702,19 @@ public class PlotSheet implements Drawable {
     @Override
     public boolean isCritical() {
         return false;
+    }
+
+    public void setTypeface(Typeface typeface) {
+        this.typeface = typeface;
+    }
+
+    public void unsetFontSize() {
+        fontSizeSet = false;
+
+    }
+
+    public void setFontSize(float fontSize) {
+        fontSizeSet = true;
+        this.fontSize = fontSize;
     }
 }

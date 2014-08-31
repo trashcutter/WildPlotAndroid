@@ -1,12 +1,24 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
 
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildplot.android.rendering.interfaces.Drawable;
 
 
 /**
@@ -34,9 +46,9 @@ public class YAxisHistoGram implements Drawable {
 	private double binSize = 1;
 	private double size = 1;
 	
-	private Color color;
+	private ColorWrap color;
 	
-	private Color fillColor;
+	private ColorWrap fillColor;
 	
 	private boolean filling = false;
 
@@ -49,7 +61,7 @@ public class YAxisHistoGram implements Drawable {
 	 * @param size size of bars from left to right
 	 * @param color border color of bars, for filling color use setFilling() and setFillingColor()
 	 */
-	public YAxisHistoGram(PlotSheet plotSheet, double[][] points, double start, double size, Color color) {
+	public YAxisHistoGram(PlotSheet plotSheet, double[][] points, double start, double size, ColorWrap color) {
 		super();
 		this.plotSheet = plotSheet;
 		this.points = points;
@@ -73,7 +85,7 @@ public class YAxisHistoGram implements Drawable {
 	 * set filling color for bars
 	 * @param fillColor
 	 */
-	public void setFillColor(Color fillColor) {
+	public void setFillColor(ColorWrap fillColor) {
 		this.fillColor = fillColor;
 	}
 
@@ -81,16 +93,17 @@ public class YAxisHistoGram implements Drawable {
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
 	@Override
-	public void paint(Graphics g) {
+	public void paint(GraphicsWrap g) {
         isOnReset = false;
 		
-		Color oldColor = g.getColor();
-		Rectangle field = g.getClipBounds();
+		ColorWrap oldColor = g.getColor();
+		RectangleWrap field = g.getClipBounds();
 		g.setColor(color);
 		
 		if(autoscale){
 			double[] start = this.plotSheet.toCoordinatePoint(0, 0, field);
-			double[] end = this.plotSheet.toCoordinatePoint(0+this.plotSheet.getFrameThickness(), 0, field);
+			double[] end = this.plotSheet.toCoordinatePoint(
+                    0+this.plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX], 0, field);
 			
 			this.scaleFactor = Math.abs(end[0] - start[0]);
 //			this.scaleFactor *= binSize;
@@ -144,7 +157,7 @@ public class YAxisHistoGram implements Drawable {
 	 * @param g graphic object used to draw this bar
 	 * @param field bounds of plot
 	 */
-	private void drawBar(double x, double y, Graphics g, Rectangle field) {
+	private void drawBar(double x, double y, GraphicsWrap g, RectangleWrap field) {
 		drawBar(x,y,g,field,this.size);
 	}
 	
@@ -156,12 +169,12 @@ public class YAxisHistoGram implements Drawable {
 	 * @param field bounds of plot
 	 * @param size specific size (width) of this bar
 	 */
-	private void drawBar(double y, double heigth, Graphics g, Rectangle field, double size) {
-		
-		
-		int[] pointUpLeft 		= plotSheet.toGraphicPoint(0,y+size , field);
-		int[] pointUpRight 		= plotSheet.toGraphicPoint(0+heigth,y+size , field);
-		int[] pointBottomLeft 	= plotSheet.toGraphicPoint(0,y , field);
+	private void drawBar(double y, double heigth, GraphicsWrap g, RectangleWrap field, double size) {
+
+
+        float[] pointUpLeft 		= plotSheet.toGraphicPoint(0,y+size , field);
+        float[] pointUpRight 		= plotSheet.toGraphicPoint(0+heigth,y+size , field);
+        float[] pointBottomLeft 	= plotSheet.toGraphicPoint(0,y , field);
 		
 		if(heigth < 0) {
 			pointUpLeft 		= plotSheet.toGraphicPoint(0+heigth,y+size , field);
@@ -179,7 +192,7 @@ public class YAxisHistoGram implements Drawable {
 		
 		
 		if(filling){
-			Color oldColor = g.getColor();
+			ColorWrap oldColor = g.getColor();
 			if(this.fillColor != null)
 				g.setColor(fillColor);
 			

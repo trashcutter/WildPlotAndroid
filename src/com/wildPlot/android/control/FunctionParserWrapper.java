@@ -1,10 +1,10 @@
-package com.wildPlot.android.control;
+package com.wildplot.android.control;
 
 import java.util.HashMap;
 
-import com.wildPlot.android.parsing.FunctionParser;
-import com.wildPlot.android.rendering.interfaces.Function2D;
-import com.wildPlot.android.rendering.interfaces.Function3D;
+import com.wildplot.android.parsing.FunctionParser;
+import com.wildplot.android.rendering.interfaces.Function2D;
+import com.wildplot.android.rendering.interfaces.Function3D;
 
 
 

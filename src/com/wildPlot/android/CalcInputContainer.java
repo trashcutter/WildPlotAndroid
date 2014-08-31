@@ -1,8 +1,8 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import java.util.ArrayList;
 
-import com.wildPlot.android.parsing.FunctionParser;
+import com.wildplot.android.parsing.FunctionParser;
 
 
 

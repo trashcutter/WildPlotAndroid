@@ -1,29 +1,40 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
 
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildplot.android.rendering.interfaces.Drawable;
 
 
 /**
  * This class represents grid lines parallel to the y-axis
- * 
- * 
+ *
  */
 public class YGrid implements Drawable {
 	public boolean hasVariableLimits = true;
 	
-	private boolean isAutoTic = true;
+	private boolean isAutoTic = false;
 	
 	private int pixelDistance = 25;
 	/**
 	 * the color of the grid lines
 	 */
-	private Color color = Color.LIGHT_GRAY;
+	private ColorWrap color = ColorWrap.LIGHT_GRAY;
 	
 	/**
 	 * the Sheet the grid lines will be drawn onto
@@ -69,14 +80,13 @@ public class YGrid implements Drawable {
 	 * true if the grid should be drawn above the x-axis
 	 */
 	private boolean gridOnUpside = true;
+    private double[] mTickPositions;
 
-	/**
+    /**
 	 * Constructor for an Y-Grid object
 	 * @param plotSheet the sheet the grid will be drawn onto
 	 * @param ticStart start point for relative positioning of grid
 	 * @param tic the space between two grid lines
-	 * @param xLength maximal distance from x axis the grid will be drawn
-	 * @param yLength maximal distance from y axis the grid will be drawn
 	 */
 	public YGrid(PlotSheet plotSheet, double ticStart, double tic) {
 		super();
@@ -91,10 +101,8 @@ public class YGrid implements Drawable {
 	 * @param plotSheet the sheet the grid will be drawn onto
 	 * @param ticStart start point for relative positioning of grid
 	 * @param tic the space between two grid lines
-	 * @param xLength maximal distance from x axis the grid will be drawn
-	 * @param yLength maximal distance from y axis the grid will be drawn
 	 */
-	public YGrid(Color color, PlotSheet plotSheet, double ticStart, double tic) {
+	public YGrid(ColorWrap color, PlotSheet plotSheet, double ticStart, double tic) {
 		super();
 		this.color = color;
 		this.plotSheet = plotSheet;
@@ -106,15 +114,13 @@ public class YGrid implements Drawable {
 	 * Constructor for an Y-Grid object
 	 * @param plotSheet the sheet the grid will be drawn onto
 	 * @param ticStart start point for relative positioning of grid
-	 * @param tic the space between two grid lines
-	 * @param xLength maximal distance from x axis the grid will be drawn
-	 * @param yLength maximal distance from y axis the grid will be drawn
 	 */
 	public YGrid(PlotSheet plotSheet, double ticStart, int pixelDistance) {
 		super();
 		this.plotSheet = plotSheet;
 		this.ticStart = ticStart;
 		this.pixelDistance = pixelDistance;
+        isAutoTic = true;
 	}
 
 	/**
@@ -122,25 +128,23 @@ public class YGrid implements Drawable {
 	 * @param color set color of the grid
 	 * @param plotSheet the sheet the grid will be drawn onto
 	 * @param ticStart start point for relative positioning of grid
-	 * @param tic the space between two grid lines
-	 * @param xLength maximal distance from x axis the grid will be drawn
-	 * @param yLength maximal distance from y axis the grid will be drawn
 	 */
-	public YGrid(Color color, PlotSheet plotSheet, double ticStart, int pixelDistance) {
+	public YGrid(ColorWrap color, PlotSheet plotSheet, double ticStart, int pixelDistance) {
 		super();
 		this.color = color;
 		this.plotSheet = plotSheet;
 		this.ticStart = ticStart;
 		this.pixelDistance = pixelDistance;
+        isAutoTic = true;
 	}
 
 	/* (non-Javadoc)
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
 	@Override
-	public void paint(Graphics g) {
-		Color oldColor = g.getColor();
-		Rectangle field = g.getClipBounds();
+	public void paint(GraphicsWrap g) {
+		ColorWrap oldColor = g.getColor();
+		RectangleWrap field = g.getClipBounds();
 		g.setColor(color);
 		
 		if(this.hasVariableLimits) {
@@ -149,9 +153,9 @@ public class YGrid implements Drawable {
 		}
 		if(this.isAutoTic)
 			this.tic = plotSheet.ticsCalcX(pixelDistance, field);
-		
-		
-		int tics = (int)((this.ticStart - (0-this.xLength))/tic);
+
+
+        int tics = (int)((this.ticStart - (0-this.xLength))/tic);
 		double leftStart = this.ticStart - this.tic*tics; 
 		
 		if(leftStart < 0 ) {
@@ -162,17 +166,37 @@ public class YGrid implements Drawable {
 			}
 			
 		}
-		double currentX = leftStart;
-		
-		while(currentX <= this.xLength && !(currentX > 0 && !this.gridOnRight)) {
-			drawGridLine(currentX, g, field);
-			currentX+=this.tic;
-			//System.err.println("another loop");
-		}
+
+
+        if(mTickPositions == null)
+            drawImplicitLines(g, leftStart);
+        else
+            drawExplicitLines(g);
+
+
 		//System.err.println("out of loop");
 		g.setColor(oldColor);
 
 	}
+    private void drawImplicitLines(GraphicsWrap g, double leftStart){
+        RectangleWrap field = g.getClipBounds();
+        double currentX = leftStart;
+
+        while(currentX <= this.xLength && !(currentX > 0 && !this.gridOnRight)) {
+            drawGridLine(currentX, g, field);
+            currentX+=this.tic;
+            //System.err.println("another loop");
+        }
+    }
+
+    private void drawExplicitLines(GraphicsWrap g){
+        RectangleWrap field = g.getClipBounds();
+
+        for(int i = 0; i< mTickPositions.length; i++) {
+            double currentX = mTickPositions[i];
+            drawGridLine(currentX, g, field);
+        }
+    }
 	
 	/**
 	 * Draw a grid line in specified graphics object
@@ -180,7 +204,7 @@ public class YGrid implements Drawable {
 	 * @param g graphic the line shall be drawn onto
 	 * @param field definition of the graphic boundaries
 	 */
-	private void drawGridLine(double x, Graphics g, Rectangle field) {
+	private void drawGridLine(double x, GraphicsWrap g, RectangleWrap field) {
 		if(this.gridOnUpside) {
 			g.drawLine(plotSheet.xToGraphic(x, field), plotSheet.yToGraphic(0, field), plotSheet.xToGraphic(x, field), plotSheet.yToGraphic(yLength, field));
 		}
@@ -235,5 +259,16 @@ public class YGrid implements Drawable {
     @Override
     public boolean isCritical() {
         return true;
+    }
+
+    public void setColor(ColorWrap color) {
+        this.color = color;
+    }
+
+    public void setExplicitTicks(double[] tickPositions){
+        mTickPositions = tickPositions;
+    }
+    public void unsetExplicitTics(){
+        mTickPositions = null;
     }
 }

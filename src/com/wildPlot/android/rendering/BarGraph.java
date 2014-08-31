@@ -1,14 +1,26 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
 
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
-import com.wildPlot.android.rendering.interfaces.Function2D;
-
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildplot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.interfaces.Function2D;
+import com.wildplot.android.rendering.interfaces.Legendable;
 
 
 /**
@@ -16,7 +28,10 @@ import com.wildPlot.android.rendering.interfaces.Function2D;
  * 
  *
  */
-public class BarGraph implements Drawable {
+public class BarGraph implements Drawable, Legendable {
+
+    private String mName = "";
+    private boolean mNameIsSet = false;
 	
 	private PlotSheet plotSheet;
 	
@@ -30,9 +45,9 @@ public class BarGraph implements Drawable {
 	
 	private double steps = 1;
 	
-	private Color color;
+	private ColorWrap color;
 	
-	private Color fillColor;
+	private ColorWrap fillColor;
 	
 	private boolean filling = false;
 	
@@ -43,7 +58,7 @@ public class BarGraph implements Drawable {
 	 * @param points start points (x,y) from each bar
 	 * @param color color of the bar
 	 */
-	public BarGraph(PlotSheet plotSheet, double size, double[][] points, Color color){
+	public BarGraph(PlotSheet plotSheet, double size, double[][] points, ColorWrap color){
 		this.plotSheet = plotSheet;
 		this.size = size;
 		this.points = points;
@@ -57,7 +72,7 @@ public class BarGraph implements Drawable {
 	 * @param function given function of the bar graph
 	 * @param color color of the bar
 	 */
-	public BarGraph(PlotSheet plotSheet, double size, Function2D function, Color color){
+	public BarGraph(PlotSheet plotSheet, double size, Function2D function, ColorWrap color){
 		this.plotSheet = plotSheet;
 		this.size = size;
 		this.function = function;
@@ -73,7 +88,7 @@ public class BarGraph implements Drawable {
 	 * @param steps step-width for the bar graph
 	 * @param color color of the bar
 	 */
-	public BarGraph(PlotSheet plotSheet, double size, Function2D function, double steps, Color color){
+	public BarGraph(PlotSheet plotSheet, double size, Function2D function, double steps, ColorWrap color){
 		this.plotSheet = plotSheet;
 		this.size = size;
 		this.function = function;
@@ -96,7 +111,7 @@ public class BarGraph implements Drawable {
 	 * Set filling color for bar graph 
 	 * @param fillColor of the bar graph
 	 */
-	public void setFillColor(Color fillColor) {
+	public void setFillColor(ColorWrap fillColor) {
 		this.fillColor = fillColor;
 	}
 
@@ -104,9 +119,9 @@ public class BarGraph implements Drawable {
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
 	@Override
-	public void paint(Graphics g) {
-		Color oldColor = g.getColor();
-		Rectangle field = g.getClipBounds();
+	public void paint(GraphicsWrap g) {
+		ColorWrap oldColor = g.getColor();
+		RectangleWrap field = g.getClipBounds();
 		g.setColor(color);
 		
 		if(this.hasFunction) {
@@ -143,7 +158,7 @@ public class BarGraph implements Drawable {
 	 * @param g graphics object for drawing
 	 * @param field bounds of plot
 	 */
-	private void drawBar(double x, double y, Graphics g, Rectangle field) {
+	private void drawBar(double x, double y, GraphicsWrap g, RectangleWrap field) {
 		drawBar(x,y,g,field,this.size);
 	}
 	
@@ -155,15 +170,15 @@ public class BarGraph implements Drawable {
 	 * @param field bounds of plot
 	 * @param size specific size for this bar
 	 */
-	private void drawBar(double x, double y, Graphics g, Rectangle field, double size) {
-		
-		
-		int[] pointUpLeft 		= plotSheet.toGraphicPoint(x-size/2, y, field);
-		int[] pointUpRight 		= plotSheet.toGraphicPoint(x+size/2, y, field);
-		int[] pointBottomLeft 	= plotSheet.toGraphicPoint(x-size/2, 0, field);
+	private void drawBar(double x, double y, GraphicsWrap g, RectangleWrap field, double size) {
+
+
+        float[] pointUpLeft 		= plotSheet.toGraphicPoint(x-size/2, y, field);
+        float[] pointUpRight 		= plotSheet.toGraphicPoint(x+size/2, y, field);
+        float[] pointBottomLeft 	= plotSheet.toGraphicPoint(x-size/2, 0, field);
 		
 		if(filling){
-			Color oldColor = g.getColor();
+			ColorWrap oldColor = g.getColor();
 			if(this.fillColor != null)
 				g.setColor(fillColor);
 			
@@ -175,14 +190,14 @@ public class BarGraph implements Drawable {
 			//g.fillRect(pointUpLeft[0], pointUpLeft[1], pointUpRight[0]-pointUpLeft[0], pointBottomLeft[1]-pointUpLeft[1]);
 			
 			g.setColor(oldColor);
-		}
-		
-		if(y<0) {
-			g.drawRect(pointUpLeft[0], plotSheet.yToGraphic(0, field), pointUpRight[0]-pointUpLeft[0], pointUpLeft[1]- pointBottomLeft[1]);
 		} else {
-			g.drawRect(pointUpLeft[0], pointUpLeft[1], pointUpRight[0]-pointUpLeft[0], pointBottomLeft[1]-pointUpLeft[1]);
-		}
-		
+
+            if (y < 0) {
+                g.drawRect(pointUpLeft[0], plotSheet.yToGraphic(0, field), pointUpRight[0] - pointUpLeft[0], pointUpLeft[1] - pointBottomLeft[1]);
+            } else {
+                g.drawRect(pointUpLeft[0], pointUpLeft[1], pointUpRight[0] - pointUpLeft[0], pointBottomLeft[1] - pointUpLeft[1]);
+            }
+        }
 //		g.drawLine(pointUpLeft[0], pointUpLeft[1], pointUpRight[0], pointUpRight[1]);
 //		g.drawLine(pointUpLeft[0], pointUpLeft[1], pointBottomLeft[0], pointBottomLeft[1]);
 //		g.drawLine(pointBottomRight[0], pointBottomRight[1], pointBottomLeft[0], pointBottomLeft[1]);
@@ -212,5 +227,25 @@ public class BarGraph implements Drawable {
     @Override
     public boolean isCritical() {
         return false;
+    }
+
+    @Override
+    public ColorWrap getColor() {
+        return fillColor;
+    }
+
+    @Override
+    public String getName() {
+        return mName;
+    }
+
+    @Override
+    public boolean nameIsSet() {
+        return mNameIsSet;
+    }
+
+    public void setName(String name){
+        mName = name;
+        mNameIsSet = true;
     }
 }

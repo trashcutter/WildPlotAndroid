@@ -15,51 +15,34 @@
  ****************************************************************************************/
 package com.wildplot.android.rendering;
 
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
 import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
 import com.wildplot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.interfaces.Legendable;
 
-import java.util.Vector;
+
+public class LegendDrawable implements Drawable, Legendable {
+
+    private String mName = "";
+    private boolean mNameIsSet = false;
 
 
-public class DrawableContainer implements Drawable {
-    Vector<Drawable> drawableVector = new Vector<Drawable>();
-    private boolean isOnFrame = false;
-    private boolean isOnAbort = false;
-    private boolean isCritical = false;
-    private Drawable currentDrawable = null;
 
-    public DrawableContainer(boolean isOnFrame, boolean isCritical){
-        this.isOnFrame = isOnFrame;
-        this.isCritical = isCritical;
-    }
-
-    public void addDrawable(Drawable drawable){
-        drawableVector.add(drawable);
-
-    }
+    private ColorWrap color = ColorWrap.BLACK;
 
     @Override
     public void paint(GraphicsWrap g) {
-        isOnAbort = false;
-        currentDrawable = null;
-        for(Drawable drawable: drawableVector){
-            currentDrawable = drawable;
-            if(isOnAbort)
-                return;
-            drawable.paint(g);
-        }
+
     }
 
     @Override
     public boolean isOnFrame() {
-        return isOnFrame;
+        return false;
     }
 
     @Override
     public void abortAndReset() {
-        isOnAbort = true;
-        if(currentDrawable != null)
-            currentDrawable.abortAndReset();
+
     }
 
     @Override
@@ -69,10 +52,29 @@ public class DrawableContainer implements Drawable {
 
     @Override
     public boolean isCritical() {
-        return isCritical;
+        return false;
     }
 
-    public int getSize(){
-        return drawableVector.size();
+    @Override
+    public ColorWrap getColor() {
+        return color;
+    }
+
+    @Override
+    public String getName() {
+        return mName;
+    }
+
+    @Override
+    public boolean nameIsSet() {
+        return mNameIsSet;
+    }
+
+    public void setName(String name){
+        mName = name;
+        mNameIsSet = true;
+    }
+    public void setColor(ColorWrap color){
+        this.color = color;
     }
 }

@@ -1,4 +1,4 @@
-package com.wildPlot.MyMath;
+package com.wildplot.MyMath;
 public class Complex
 {
     final double PI=Math.PI;

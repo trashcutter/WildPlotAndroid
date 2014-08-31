@@ -1,4 +1,4 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

@@ -1,7 +1,7 @@
-package com.wildPlot.android.densityFunctions;
+package com.wildplot.android.densityFunctions;
 
 
-import com.wildPlot.android.rendering.interfaces.StepFunction2D;
+import com.wildplot.android.rendering.interfaces.StepFunction2D;
 
 public class ASH implements StepFunction2D {
 	

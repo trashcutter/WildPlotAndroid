@@ -1,16 +1,25 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
 
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics2D;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
-import com.wildPlot.android.rendering.interfaces.Function2D;
-
-
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildplot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.interfaces.Function2D;
 
 
 /**
@@ -30,13 +39,13 @@ public class Integral implements Drawable {
 	
 	private double end = Math.PI;
 	
-	private Color color = new Color(0.7f, 1f, 0f, 0.4f);
+	private ColorWrap color = new ColorWrap(0.7f, 1f, 0f, 0.4f);
 	
 	/**
 	 * set the color for integral area
 	 * @param color integral area color
 	 */
-	public void setColor(Color color) {
+	public void setColor(ColorWrap color) {
 		this.color = color;
 	}
 
@@ -77,33 +86,31 @@ public class Integral implements Drawable {
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
 	@Override
-	public void paint(Graphics g) {
+	public void paint(GraphicsWrap g) {
 		
-		Color oldColor = g.getColor();
-		Rectangle field = g.getClipBounds();
-		Graphics2D g2d = (Graphics2D)g;
-		g2d.setColor(color);
+		ColorWrap oldColor = g.getColor();
+		RectangleWrap field = g.getClipBounds();
+		g.setColor(color);
+
+        float[] startPoint 	= plotSheet.toGraphicPoint(this.start, 0, field);
+        float[] endPoint 		= plotSheet.toGraphicPoint(this.end, 0, field);
 		
-		int[] startPoint 	= plotSheet.toGraphicPoint(this.start, 0, field);
-		int[] endPoint 		= plotSheet.toGraphicPoint(this.end, 0, field);
-		
-		for(int i = startPoint[0]; i<=endPoint[0];i++) {
+		for(int i = Math.round(startPoint[0]); i<=endPoint[0];i++) {
 			double currentX = plotSheet.xToCoordinate(i, field);
 			double currentY = function.f(currentX);
 			
 			if(this.function2 != null){
 				double currentY2 = function2.f(currentX);
-				g2d.drawLine(plotSheet.xToGraphic(currentX, field), plotSheet.yToGraphic(currentY, field), plotSheet.xToGraphic(currentX, field), plotSheet.yToGraphic(currentY2, field));
+				g.drawLine(plotSheet.xToGraphic(currentX, field), plotSheet.yToGraphic(currentY, field), plotSheet.xToGraphic(currentX, field), plotSheet.yToGraphic(currentY2, field));
 			}else {
-				g2d.drawLine(plotSheet.xToGraphic(currentX, field), plotSheet.yToGraphic(currentY, field), plotSheet.xToGraphic(currentX, field), plotSheet.yToGraphic(0, field));
+				g.drawLine(plotSheet.xToGraphic(currentX, field), plotSheet.yToGraphic(currentY, field), plotSheet.xToGraphic(currentX, field), plotSheet.yToGraphic(0, field));
 			}
 			
 			
 			
 		}
 		
-		g2d = (Graphics2D)g;
-		
+
 		g.setColor(oldColor);
 
 	}

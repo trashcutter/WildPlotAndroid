@@ -1,16 +1,28 @@
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
+
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildplot.android.rendering.interfaces.Drawable;
+
+
 /**
- * 
- */
-package com.wildPlot.android.rendering;
-
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
-
-
-/**
- * Histogram plot, detailed informations regarding histograms are available in the internets
+ * BarGraph Drawable, draw bars on specified positions filled with color or not
  * 
  *
  */
@@ -34,20 +46,19 @@ public class XAxisBarGraph implements Drawable {
 	
 	private double size = 1;
 	
-	private Color color;
+	private ColorWrap color;
 	
-	private Color fillColor;
+	private ColorWrap fillColor;
 	
 	private boolean filling = false;
 
 	/**
 	 * @param plotSheet
 	 * @param points the points used for calculating histogram data
-	 * @param start relative start position of histogram bars the other bars will be aligned to
 	 * @param size size of bars from left to right
 	 * @param color border color of bars, for filling color use setFilling() and setFillingColor()
 	 */
-	public XAxisBarGraph(PlotSheet plotSheet, double[][] points, double size, Color color) {
+	public XAxisBarGraph(PlotSheet plotSheet, double[][] points, double size, ColorWrap color) {
 		super();
 		this.plotSheet = plotSheet;
 		this.points = points;
@@ -70,7 +81,7 @@ public class XAxisBarGraph implements Drawable {
 	 * set filling color for bars
 	 * @param fillColor
 	 */
-	public void setFillColor(Color fillColor) {
+	public void setFillColor(ColorWrap fillColor) {
 		this.fillColor = fillColor;
 	}
 
@@ -78,16 +89,17 @@ public class XAxisBarGraph implements Drawable {
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
 	@Override
-	public void paint(Graphics g) {
+	public void paint(GraphicsWrap g) {
 		
 		
-		Color oldColor = g.getColor();
-		Rectangle field = g.getClipBounds();
+		ColorWrap oldColor = g.getColor();
+		RectangleWrap field = g.getClipBounds();
 		g.setColor(color);
 		
 		if(autoscale){
 			double[] start = this.plotSheet.toCoordinatePoint(0, 0, field);
-			double[] end = this.plotSheet.toCoordinatePoint(0, 0+this.plotSheet.getFrameThickness(), field);
+			double[] end = this.plotSheet.toCoordinatePoint(0,
+                    0+this.plotSheet.getFrameThickness()[PlotSheet.UPPER_FRAME_THICKNESS_INDEX], field);
 			
 			this.scaleFactor = Math.abs(end[1] - start[1]);
 		} else {
@@ -117,7 +129,7 @@ public class XAxisBarGraph implements Drawable {
 	 * @param g graphic object used to draw this bar
 	 * @param field bounds of plot
 	 */
-	private void drawBar(double x, double y, Graphics g, Rectangle field) {
+	private void drawBar(double x, double y, GraphicsWrap g, RectangleWrap field) {
 		drawBar(x,y,g,field,this.size);
 	}
 	
@@ -129,12 +141,12 @@ public class XAxisBarGraph implements Drawable {
 	 * @param field bounds of plot
 	 * @param size specific size (width) of this bar
 	 */
-	private void drawBar(double x, double heigth, Graphics g, Rectangle field, double size) {
-		
-		
-		int[] pointUpLeft 		= plotSheet.toGraphicPoint(x, heigth, field);
-		int[] pointUpRight 		= plotSheet.toGraphicPoint(x+size, heigth, field);
-		int[] pointBottomLeft 	= plotSheet.toGraphicPoint(x, 0, field);
+	private void drawBar(double x, double heigth, GraphicsWrap g, RectangleWrap field, double size) {
+
+
+        float[] pointUpLeft 		= plotSheet.toGraphicPoint(x, heigth, field);
+        float[] pointUpRight 		= plotSheet.toGraphicPoint(x+size, heigth, field);
+        float[] pointBottomLeft 	= plotSheet.toGraphicPoint(x, 0, field);
 		
 		if(heigth < 0) {
 			pointUpLeft 		= plotSheet.toGraphicPoint(x, 0, field);
@@ -150,7 +162,7 @@ public class XAxisBarGraph implements Drawable {
 		
 		
 		if(filling){
-			Color oldColor = g.getColor();
+			ColorWrap oldColor = g.getColor();
 			if(this.fillColor != null)
 				g.setColor(fillColor);
 			

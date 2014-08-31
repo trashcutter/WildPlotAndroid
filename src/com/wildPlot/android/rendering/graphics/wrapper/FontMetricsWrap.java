@@ -13,18 +13,26 @@
  * You should have received a copy of the GNU General Public License along with         *
  * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
  ****************************************************************************************/
-package com.wildplot.android.rendering.interfaces;
+package com.wildplot.android.rendering.graphics.wrapper;
 
-/**
- * Interface for functions with one dependent variable
- */
-public interface Function2D {
+public class FontMetricsWrap {
+    private GraphicsWrap g;
 
-	/**
-	 * 
-	 * @param x given x value
-	 * @return calculated y value
-	 */
-	public double f(double x);
+    public FontMetricsWrap(GraphicsWrap g) {
+        super();
+        this.g = g;
+    }
+    
+    public float stringWidth(String text){
+        return g.getPaint().measureText(text);
+        
+    }
 
+    public float getHeight() {
+        return g.getPaint().getTextSize();
+    }
+
+    public float getHeight(boolean foo) {
+        return g.getPaint().getTextSize();
+    }
 }

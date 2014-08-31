@@ -1,6 +1,6 @@
-package com.wildPlot.system;
+package com.wildplot.system;
 
-import com.wildPlot.MyMath.Matrix_d;
+import com.wildplot.MyMath.Matrix_d;
 
 // a set of 3 chemical reactions
 // our solvers won't work for this system!

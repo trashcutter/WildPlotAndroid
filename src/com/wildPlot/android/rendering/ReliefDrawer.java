@@ -1,33 +1,40 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
 
+
+import com.wildplot.android.parsing.TopLevelParser;
+import com.wildplot.android.rendering.graphics.wrapper.*;
+import com.wildplot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.interfaces.Function3D;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Vector;
 
-import com.wildPlot.android.newParsing.TopLevelParser;
-import com.wildPlot.android.rendering.graphics.wrapper.BufferedImage;
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics2D;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
-import com.wildPlot.android.rendering.interfaces.Function3D;
-
 
 /**
  * Draws a relief of a three dimensional function on a two dimensional plot sheet. The relief is drawn either with borders
  * or with a color gradient.
- * 
- * @author Michael Goldbach
+ *
  */
 public class ReliefDrawer implements Drawable {
 	
 	
-	private int pixelSkip = 6;
+	private float pixelSkip = 6;
 	private boolean abortPaint = false;
 	private boolean depthSearchAborted = false;
 	
@@ -71,7 +78,7 @@ public class ReliefDrawer implements Drawable {
 //			new Color(98, 217, 62), new Color(148, 223, 50),new Color(188, 233, 35), new Color(235, 246, 20),new Color(245, 180, 10),new Color(255, 127, 0),
 //			new Color(255, 88, 0),new Color(255, 39, 0), new Color(192, 19, 0), new Color(128, 0, 0) };
 	
-	private Color[] gradientColors = {Color.white, Color.GREEN.darker(), Color.GREEN.darker().darker(), Color.BLACK};
+	private ColorWrap[] gradientColors = {ColorWrap.white, ColorWrap.GREEN.darker(), ColorWrap.GREEN.darker().darker(), ColorWrap.BLACK};
     //private Color[] gradientColors = {Color.white, Color.BLACK};
 	
 	/**
@@ -99,7 +106,7 @@ public class ReliefDrawer implements Drawable {
 	/**
 	 * border color for non-colored plots
 	 */
-	private Color color = new Color(255,0,0);
+	private ColorWrap color = new ColorWrap(255,0,0);
 	
 	/**
 	 * Creates a new ReliefDrawer object
@@ -121,7 +128,7 @@ public class ReliefDrawer implements Drawable {
 			if(this.gradientColors.length >= heightRegionCount){
 				this.heightRegionCount = this.gradientColors.length;
 			} else {
-				Vector<Color> colorVector = new Vector<Color>(Arrays.asList(this.gradientColors));
+				Vector<ColorWrap> colorVector = new Vector<ColorWrap>(Arrays.asList(this.gradientColors));
 				this.gradientColors = RelativeColorGradient.makeGradient(colorVector, this.heightRegionCount);
 				this.heightRegionCount = this.gradientColors.length;
 			}
@@ -155,7 +162,7 @@ public class ReliefDrawer implements Drawable {
 	 * @param colored true if a color gradient should be used, false if borders shall be used
 	 * @param color color of borders if non colored plot is used
 	 */
-	public ReliefDrawer(double gradientCurveFactor, int heightRegionCount, Function3D function, PlotSheet plotSheet,boolean colored, Color color) {
+	public ReliefDrawer(double gradientCurveFactor, int heightRegionCount, Function3D function, PlotSheet plotSheet,boolean colored, ColorWrap color) {
 		super();
 		this.gradientCurveFactor = gradientCurveFactor;
 		this.heightRegionCount = heightRegionCount;
@@ -168,7 +175,7 @@ public class ReliefDrawer implements Drawable {
 			if(this.gradientColors.length >= heightRegionCount){
 				this.heightRegionCount = this.gradientColors.length;
 			} else {
-				Vector<Color> colorVector = new Vector<Color>(Arrays.asList(this.gradientColors));
+				Vector<ColorWrap> colorVector = new Vector<ColorWrap>(Arrays.asList(this.gradientColors));
 				this.gradientColors = RelativeColorGradient.makeGradient(colorVector, this.heightRegionCount);
 				this.heightRegionCount = this.gradientColors.length;
 			}
@@ -179,10 +186,10 @@ public class ReliefDrawer implements Drawable {
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
 	@Override
-	public void paint(Graphics g) {
+	public void paint(GraphicsWrap g) {
 		abortPaint = false;
-		Color oldColor = g.getColor();
-		Rectangle field = g.getClipBounds();
+		ColorWrap oldColor = g.getColor();
+		RectangleWrap field = g.getClipBounds();
 		
 		
 		if(rangeHasChanged()){
@@ -217,12 +224,12 @@ public class ReliefDrawer implements Drawable {
 	 * draws relief with color gradient
 	 * @param g graphic object used to draw relief
 	 */
-	private void drawColoredRelief(Graphics g) throws InterruptedException {
-		Rectangle field = g.getClipBounds();
+	private void drawColoredRelief(GraphicsWrap g) throws InterruptedException {
+		RectangleWrap field = g.getClipBounds();
 		
-		BufferedImage[] bimages = new BufferedImage[threadCnt];
+		BufferedImageWrap[] bimages = new BufferedImageWrap[threadCnt];
 		for(int i = 0; i< bimages.length; i++){
-			bimages[i] = new BufferedImage(field.width, field.height, BufferedImage.TYPE_INT_ARGB);
+			bimages[i] = new BufferedImageWrap(field.width, field.height, BufferedImageWrap.TYPE_INT_ARGB);
 		}
 		
 //		double[] thisCoordinate = plotSheet.toCoordinatePoint(0, 0, field);
@@ -237,26 +244,37 @@ public class ReliefDrawer implements Drawable {
 //				
 //			}
 //		}
-		
-		int length = (field.x + field.width-plotSheet.getFrameThickness()) - (field.x+plotSheet.getFrameThickness());
+
+        float length = (field.x + field.width-plotSheet.getFrameThickness()[PlotSheet.RIGHT_FRAME_THICKNESS_INDEX]) -
+                (field.x+plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX]);
 		Thread[] threads = new Thread[threadCnt];
 		
 		PartRenderer[] partRenderer = new PartRenderer[threadCnt];
 		
-		Graphics gnew = bimages[0].getGraphics();
+		GraphicsWrap gnew = bimages[0].getGraphics();
 		gnew.setClip(field);
-		partRenderer[0] = new PartRenderer(gnew, field.x+plotSheet.getFrameThickness(), field.x + plotSheet.getFrameThickness()+ length/threadCnt,function);
+		partRenderer[0] = new PartRenderer(gnew,
+                field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX],
+                field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX]+ length/threadCnt,
+                function);
 		threads[0] = new Thread(partRenderer[0]);
 		for(int i = 1; i< threads.length-1; i++){
 			gnew = bimages[i].getGraphics();
 			gnew.setClip(field);
-			partRenderer[i] = new PartRenderer(gnew, field.x + plotSheet.getFrameThickness() + length*i/threadCnt +1, field.x+ plotSheet.getFrameThickness() + length*(i+1)/threadCnt,function);
+			partRenderer[i] = new PartRenderer(gnew,
+                    field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] +
+                            length*i/threadCnt +1,
+                    field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] +
+                            length*(i+1)/threadCnt,function);
 			threads[i] = new Thread(partRenderer[i]);
 		}
 		if(threadCnt > 1){
 		gnew = bimages[threadCnt-1].getGraphics();
 		gnew.setClip(field);
-		partRenderer[threadCnt-1] = new PartRenderer(gnew, field.x + plotSheet.getFrameThickness() + length*(threadCnt-1)/threadCnt +1, field.x+ plotSheet.getFrameThickness() + length,function);
+		partRenderer[threadCnt-1] = new PartRenderer(gnew,
+                field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] +
+                        length*(threadCnt-1)/threadCnt +1,
+                field.x+ plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] + length,function);
 		threads[threadCnt-1] = new Thread(partRenderer[threadCnt-1]);
 		}
 		for(Thread thread : threads) {
@@ -267,8 +285,8 @@ public class ReliefDrawer implements Drawable {
 			thread.join();
 		}
 		
-		for(BufferedImage bimage: bimages){
-			((Graphics2D)g).drawImage(bimage, null, 0, 0);
+		for(BufferedImageWrap bimage: bimages){
+			g.drawImage(bimage, null, 0, 0);
 		}
 		
 		//
@@ -278,8 +296,8 @@ public class ReliefDrawer implements Drawable {
 	 * draws bordered relief plot
 	 * @param g graphic object used to draw relief
 	 */
-	private void drawBorders(Graphics g) {
-		Rectangle field = g.getClipBounds();
+	private void drawBorders(GraphicsWrap g) {
+		RectangleWrap field = g.getClipBounds();
 		double[] thisCoordinate = plotSheet.toCoordinatePoint(0, 0, field);
 		double[] upToThisCoordinate = plotSheet.toCoordinatePoint(0, 0, field);
 		double[] leftToThisCoordinate = plotSheet.toCoordinatePoint(0, 0, field);
@@ -288,8 +306,10 @@ public class ReliefDrawer implements Drawable {
 		double upToThisF_xy;
 		double leftToThisF_xy;
 		
-		for(int i = field.x+plotSheet.getFrameThickness() + 1; i < field.x + field.width-plotSheet.getFrameThickness(); i++) {
-			for(int j = field.y+plotSheet.getFrameThickness() + 1; j < field.y +field.height-plotSheet.getFrameThickness(); j++) {
+		for(int i = Math.round(field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] + 1);
+            i < field.x + field.width-plotSheet.getFrameThickness()[PlotSheet.RIGHT_FRAME_THICKNESS_INDEX]; i++) {
+			for(int j = Math.round(field.y + plotSheet.getFrameThickness()[PlotSheet.UPPER_FRAME_THICKNESS_INDEX] + 1);
+                j < field.y +field.height-plotSheet.getFrameThickness()[PlotSheet.BOTTOM_FRAME_THICKNESS_INDEX]; j++) {
 				thisCoordinate = plotSheet.toCoordinatePoint(i, j, field);
 				upToThisCoordinate = plotSheet.toCoordinatePoint(i, j-1, field);
 				leftToThisCoordinate = plotSheet.toCoordinatePoint(i-1, j, field);
@@ -329,30 +349,36 @@ public class ReliefDrawer implements Drawable {
 	 * scan depth of relief to determine distance between borders
 	 * @param field bounds of plot
 	 */
-	private void scanDepth(Rectangle field) throws InterruptedException {
+	private void scanDepth(RectangleWrap field) throws InterruptedException {
 		depthSearchAborted = true;
 		double[] coordinate = plotSheet.toCoordinatePoint(0, 0, field);
 		double f_xy = function.f(coordinate[0], coordinate[1]);
 		this.f_xHighest = f_xy;
 		this.f_xLowest 	= f_xy;
-		
-		int length = (field.x + field.width-plotSheet.getFrameThickness()) - (field.x+plotSheet.getFrameThickness());
+
+        float length = (field.x + field.width-plotSheet.getFrameThickness()[PlotSheet.RIGHT_FRAME_THICKNESS_INDEX]) -
+                (field.x+plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX]);
 		Thread[] threads = new Thread[threadCnt];
-		
-		int stepSize = length/threadCnt;
+
+        float stepSize = length/threadCnt;
 		
 		DepthSearcher[] dSearcher = new DepthSearcher[threadCnt];
-		
-		int leftLim = field.x+plotSheet.getFrameThickness();
-		int rightLim = (field.x + plotSheet.getFrameThickness()+ (stepSize));
+
+        float leftLim = field.x+plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX];
+        float rightLim = (field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX]+ (stepSize));
 		dSearcher[0] = new DepthSearcher(field,leftLim ,rightLim );
 		threads[0] = new Thread(dSearcher[0]);
 		for(int i = 1; i< threads.length-1; i++){
-			dSearcher[i] = new DepthSearcher(field, field.x + plotSheet.getFrameThickness() + stepSize*i +1, field.x+ plotSheet.getFrameThickness() + stepSize*(i+1));
+			dSearcher[i] = new DepthSearcher(field,
+                    field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] + stepSize*i +1,
+                    field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] + stepSize*(i+1));
 			threads[i] = new Thread(dSearcher[i]);
 		}
 		if(threadCnt>1){
-			dSearcher[threadCnt-1] = new DepthSearcher(field, field.x + plotSheet.getFrameThickness() + stepSize*(threadCnt-1) +1, field.x+ plotSheet.getFrameThickness() + length);
+			dSearcher[threadCnt-1] = new DepthSearcher(field,
+                    field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] +
+                            stepSize*(threadCnt-1) +1,
+                    field.x + plotSheet.getFrameThickness()[PlotSheet.LEFT_FRAME_THICKNESS_INDEX] + length);
 			threads[threadCnt-1] = new Thread(dSearcher[threadCnt-1]);
 		}
 		for(Thread thread : threads) {
@@ -376,7 +402,7 @@ public class ReliefDrawer implements Drawable {
 		double steps = (this.f_xHighest - this.f_xLowest)/this.heightRegionCount;
 		
 		for(int i = 0; i < borders.length ; i++) {
-			borders[i] =  this.f_xLowest +  (this.f_xHighest - this.f_xLowest)*Math.pow((1.0/this.heightRegionCount)*(i+1.0), gradientCurveFactor);
+			borders[i] =  this.f_xLowest +  (this.f_xHighest - this.f_xLowest)* Math.pow((1.0 / this.heightRegionCount) * (i + 1.0), gradientCurveFactor);
 			//System.err.println(borders[i]+" " + (this.f_xHighest - this.f_xLowest)*Math.pow((1.0/this.heightRegionCount)*(i+1.0), gradientCurveFactor));
 		}
 		if(!this.abortPaint){
@@ -413,13 +439,11 @@ public class ReliefDrawer implements Drawable {
 	 * @param f_xy function value
 	 * @return color that corresponds to the function value
 	 */
-	private Color getColor(double f_xy) {
+	private ColorWrap getColor(double f_xy) {
 		double lowerBorder = this.f_xLowest;
 		double higherBorder = this.f_xHighest;
 		try{
-			if(borders == null){
-				System.err.println("!!!!!!!!!!!!!!!!!!! Borders null");
-			}
+
 			for(int i = 0 ; i< borders.length; i++) {
 				higherBorder = borders[i];
 				if((f_xy >= lowerBorder && f_xy < higherBorder)) {
@@ -430,7 +454,6 @@ public class ReliefDrawer implements Drawable {
 			}
 		} catch(NullPointerException e){
 			e.printStackTrace();
-			System.err.println("!!!!!!!!!!!!: " + borders.length);
 			System.exit(-1);
 		}
 		
@@ -471,7 +494,7 @@ public class ReliefDrawer implements Drawable {
 		/**
 		 * Format that is used to print numbers under markers
 		 */
-		private DecimalFormat df =   new DecimalFormat( "##0.00#" );	
+		private DecimalFormat df =   new DecimalFormat( "##0.00#" );
 		private DecimalFormat dfScience =   new DecimalFormat( "0.0###E0" );
 		private boolean isAborted = false;
 		private boolean isScientific = false;
@@ -480,7 +503,7 @@ public class ReliefDrawer implements Drawable {
 		 * (non-Javadoc)
 		 * @see rendering.Drawable#paint(java.awt.Graphics)
 		 */
-		public void paint(Graphics g) {
+		public void paint(GraphicsWrap g) {
 			isAborted = false;
 			while(!ReliefDrawer.this.depthScanningIsFinished || rangeHasChanged()){
 				if(this.isAborted){
@@ -496,13 +519,13 @@ public class ReliefDrawer implements Drawable {
 				}
 			}
 			ReliefDrawer.this.depthScanningIsFinished = false;
-			Color oldColor = g.getColor();
-			Rectangle field = g.getClipBounds();
+			ColorWrap oldColor = g.getColor();
+			RectangleWrap field = g.getClipBounds();
 			double deltaZ = (ReliefDrawer.this.yrange[1] - ReliefDrawer.this.yrange[0])/ReliefDrawer.this.borders.length;
 			
 			
 			@SuppressWarnings("deprecation")
-			int leftStart = plotSheet.xToGraphic(ReliefDrawer.this.xrange[1], field) + 10;
+            float leftStart = plotSheet.xToGraphic(ReliefDrawer.this.xrange[1], field) + 10;
 			
 			double lowerStart = ReliefDrawer.this.f_xLowest;
 			double upperEnd = 0;
@@ -514,7 +537,7 @@ public class ReliefDrawer implements Drawable {
 
                 upperEnd = border;
                 deltaZ = yToZQuotient * (upperEnd - lowerStart);
-                Color regionColor = ReliefDrawer.this.getColor((lowerStart + upperEnd) / 2);
+                ColorWrap regionColor = ReliefDrawer.this.getColor((lowerStart + upperEnd) / 2);
 
                 g.setColor(regionColor);
                 g.fillRect(leftStart, plotSheet.yToGraphic(currentHeight + deltaZ, field), 10, plotSheet.yToGraphic(currentHeight, field) - plotSheet.yToGraphic(currentHeight + deltaZ, field));
@@ -523,7 +546,7 @@ public class ReliefDrawer implements Drawable {
                 lowerStart = upperEnd;
             }
 			
-			g.setColor(Color.black);
+			g.setColor(ColorWrap.black);
 			double ztics = ticsCalc(ReliefDrawer.this.f_xHighest - ReliefDrawer.this.f_xLowest, 12);
 			
 			
@@ -555,8 +578,8 @@ public class ReliefDrawer implements Drawable {
 		 * @param ticlimit number of maximal tics in given range
 		 * @return tics for the specified parameters
 		 */
-		private double ticsCalc(double deltaRange, int ticlimit){
-			double tics = Math.pow(10, (int)Math.log10(deltaRange/ticlimit));
+		private double ticsCalc(double deltaRange, float ticlimit){
+			double tics = Math.pow(10, (int) Math.log10(deltaRange / ticlimit));
 			while(2.0*(deltaRange/(tics)) <= ticlimit) {
 				tics /= 2.0;
 			}
@@ -590,17 +613,17 @@ public class ReliefDrawer implements Drawable {
         }
 
     }
-	private class DepthSearcher implements Runnable{
+	private class DepthSearcher implements Runnable {
 
 		double f_xHighest = 0;
 		double f_xLowest = 0;
 		
-		Rectangle field = null;
-		int leftLim = 0;
-		int rightLim = 0;
+		RectangleWrap field = null;
+        float leftLim = 0;
+        float rightLim = 0;
         Function3D function;
 
-		public DepthSearcher(Rectangle field, int leftLim, int rightLim) {
+		public DepthSearcher(RectangleWrap field, float leftLim, float rightLim) {
 			super();
 			this.field = field;
 			this.leftLim = leftLim;
@@ -619,8 +642,10 @@ public class ReliefDrawer implements Drawable {
 			this.f_xLowest 	= f_xy;
 			
 			//scan for minimum and maximum f(x,y) in the given range
-			for(int i = leftLim; i <= rightLim; i+=pixelSkip) {
-				for(int j = field.y+plotSheet.getFrameThickness(); j < field.y +field.height-plotSheet.getFrameThickness(); j+=pixelSkip) {
+			for(int i = Math.round(leftLim); i <= rightLim; i+=pixelSkip) {
+				for(int j = Math.round(field.y + plotSheet.getFrameThickness()[PlotSheet.UPPER_FRAME_THICKNESS_INDEX]);
+                    j < field.y +field.height-plotSheet.getFrameThickness()[PlotSheet.BOTTOM_FRAME_THICKNESS_INDEX];
+                    j+=pixelSkip) {
 					if(abortPaint){
 						return;
 					}
@@ -650,15 +675,15 @@ public class ReliefDrawer implements Drawable {
 
 	}
 	
-	private class PartRenderer implements Runnable{
+	private class PartRenderer implements Runnable {
 
-		Graphics g = null;
-		Rectangle field = null;
-		int leftLim = 0;
-		int rightLim = 0;
+		GraphicsWrap g = null;
+		RectangleWrap field = null;
+        float leftLim = 0;
+        float rightLim = 0;
         Function3D function;
 
-		public PartRenderer(Graphics g, int leftLim, int rightLim, Function3D function) {
+		public PartRenderer(GraphicsWrap g, float leftLim, float rightLim, Function3D function) {
 			super();
 			this.field = g.getClipBounds();
 			this.leftLim = leftLim;
@@ -675,8 +700,10 @@ public class ReliefDrawer implements Drawable {
 			double[] thisCoordinate = plotSheet.toCoordinatePoint(0, 0, field);
 			
 			double thisF_xy;
-			for(int i = leftLim ; i <= rightLim; i+=pixelSkip) {
-				for(int j = field.y + +plotSheet.getFrameThickness() ; j < field.y +field.height -plotSheet.getFrameThickness(); j+=pixelSkip) {
+			for(int i = Math.round(leftLim) ; i <= rightLim; i+=pixelSkip) {
+				for(int j = Math.round(field.y + +plotSheet.getFrameThickness()[PlotSheet.UPPER_FRAME_THICKNESS_INDEX]);
+                    j < field.y +field.height -plotSheet.getFrameThickness()[PlotSheet.BOTTOM_FRAME_THICKNESS_INDEX];
+                    j+=pixelSkip) {
 					if(abortPaint)
 						return;
 					thisCoordinate = plotSheet.toCoordinatePoint(i, j, field);
@@ -698,11 +725,11 @@ public class ReliefDrawer implements Drawable {
 		
 	}
 
-	public int getPixelSkip() {
+	public float getPixelSkip() {
 		return pixelSkip;
 	}
 
-	public void setPixelSkip(int pixelSkip) {
+	public void setPixelSkip(float pixelSkip) {
 		this.pixelSkip = pixelSkip;
 	}
 

@@ -1,7 +1,7 @@
-package com.wildPlot.android.densityFunctions;
+package com.wildplot.android.densityFunctions;
 
 
-import com.wildPlot.android.rendering.interfaces.Function2D;
+import com.wildplot.android.rendering.interfaces.Function2D;
 
 public class KDE implements Function2D {
 	private double[] points;

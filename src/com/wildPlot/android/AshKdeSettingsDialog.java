@@ -1,4 +1,4 @@
-package com.wildPlot.android;
+package com.wildplot.android;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,8 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import com.wildPlot.MyMath.Polynomial;
-import com.wildPlot.system.ODE;
+import com.wildplot.MyMath.Polynomial;
 
 /**
  * Created by Michael Goldbach

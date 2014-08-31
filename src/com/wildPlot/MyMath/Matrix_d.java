@@ -1,9 +1,9 @@
 //
 // a class for real valued dense matrices
 //
-package com.wildPlot.MyMath;
+package com.wildplot.MyMath;
 
-import com.wildPlot.system.Vec_d;
+import com.wildplot.system.Vec_d;
 
 public class Matrix_d
 {

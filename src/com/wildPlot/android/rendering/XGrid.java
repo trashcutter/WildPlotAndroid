@@ -1,12 +1,24 @@
-/**
- * 
- */
-package com.wildPlot.android.rendering;
+/****************************************************************************************
+ * Copyright (c) 2014 Michael Goldbach <michael@wildplot.com>                           *
+ *                                                                                      *
+ * This program is free software; you can redistribute it and/or modify it under        *
+ * the terms of the GNU General Public License as published by the Free Software        *
+ * Foundation; either version 3 of the License, or (at your option) any later           *
+ * version.                                                                             *
+ *                                                                                      *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY      *
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A      *
+ * PARTICULAR PURPOSE. See the GNU General Public License for more details.             *
+ *                                                                                      *
+ * You should have received a copy of the GNU General Public License along with         *
+ * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
+ ****************************************************************************************/
+package com.wildplot.android.rendering;
 
-import com.wildPlot.android.rendering.graphics.wrapper.Color;
-import com.wildPlot.android.rendering.graphics.wrapper.Graphics;
-import com.wildPlot.android.rendering.graphics.wrapper.Rectangle;
-import com.wildPlot.android.rendering.interfaces.Drawable;
+import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildplot.android.rendering.interfaces.Drawable;
 
 
 /**
@@ -17,14 +29,14 @@ public class XGrid implements Drawable {
 	
 	public boolean hasVariableLimits = true;
 	
-	private boolean isAutoTic = true;
+	private boolean isAutoTic = false;
 	
 	private int pixelDistance = 25;
 	
 	/**
 	 * the color of the grid lines
 	 */
-	private Color color = Color.LIGHT_GRAY;
+	private ColorWrap color = ColorWrap.LIGHT_GRAY;
 	
 	/**
 	 * the Sheet the grid lines will be drawn onto
@@ -90,7 +102,7 @@ public class XGrid implements Drawable {
 	 * @param ticStart start point for relative positioning of grid
 	 * @param tic the space between two grid lines
 	 */
-	public XGrid(Color color, PlotSheet plotSheet, double ticStart, double tic) {
+	public XGrid(ColorWrap color, PlotSheet plotSheet, double ticStart, double tic) {
 		super();
 		this.color = color;
 		this.plotSheet = plotSheet;
@@ -107,6 +119,7 @@ public class XGrid implements Drawable {
 		this.plotSheet = plotSheet;
 		this.ticStart = ticStart;
 		this.pixelDistance = pixelDistance;
+        isAutoTic = true;
 	}
 	
 	/**
@@ -114,12 +127,13 @@ public class XGrid implements Drawable {
 	 * @param plotSheet the sheet the grid will be drawn onto
 	 * @param ticStart start point for relative positioning of grid
 	 */
-	public XGrid(Color color, PlotSheet plotSheet, double ticStart, int pixelDistance) {
+	public XGrid(ColorWrap color, PlotSheet plotSheet, double ticStart, int pixelDistance) {
 		super();
 		this.color = color;
 		this.plotSheet = plotSheet;
 		this.ticStart = ticStart;
 		this.pixelDistance = pixelDistance;
+        isAutoTic = true;
 	}
 
 
@@ -130,7 +144,7 @@ public class XGrid implements Drawable {
 	 * @see rendering.Drawable#paint(java.awt.Graphics)
 	 */
 	@Override
-	public void paint(Graphics g) {
+	public void paint(GraphicsWrap g) {
 		
 		if(this.hasVariableLimits) {
 			this.xLength = Math.max(Math.abs(plotSheet.getxRange()[0]), Math.abs(plotSheet.getxRange()[1]));
@@ -138,13 +152,13 @@ public class XGrid implements Drawable {
 		}
 		
 		
-		Color oldColor = g.getColor();
-		Rectangle field = g.getClipBounds();
+		ColorWrap oldColor = g.getColor();
+		RectangleWrap field = g.getClipBounds();
 		g.setColor(color);
 		if(this.isAutoTic)
 			this.tic = plotSheet.ticsCalcY(pixelDistance, field);
-		
-		int tics = (int)((this.ticStart - (0-this.yLength))/tic);
+
+        int tics = (int)((this.ticStart - (0-this.yLength))/tic);
 		double downStart = this.ticStart - this.tic*tics; 
 		
 		if(downStart < 0 ) {
@@ -173,7 +187,7 @@ public class XGrid implements Drawable {
 	 * @param g graphic the line shall be drawn onto
 	 * @param field definition of the graphic boundaries
 	 */
-	private void drawGridLine(double y, Graphics g, Rectangle field) {
+	private void drawGridLine(double y, GraphicsWrap g, RectangleWrap field) {
 		if(this.gridkOnLeft) {
 			g.drawLine(plotSheet.xToGraphic(0, field), plotSheet.yToGraphic(y, field), plotSheet.xToGraphic(-this.xLength, field), plotSheet.yToGraphic(y, field));
 		}
@@ -233,5 +247,9 @@ public class XGrid implements Drawable {
     @Override
     public boolean isCritical() {
         return true;
+    }
+
+    public void setColor(ColorWrap color) {
+        this.color = color;
     }
 }

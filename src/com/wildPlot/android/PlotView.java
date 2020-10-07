@@ -1,10 +1,10 @@
-package com.wildplot.android;
+package com.wildPlot.android;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.util.Log;
-import com.wildplot.android.rendering.*;
-import com.wildplot.android.rendering.graphics.wrapper.*;
+import com.wildPlot.android.rendering.*;
+import com.wildPlot.android.rendering.graphics.wrapper.*;
 
 import android.content.Context;
 import android.graphics.Bitmap;

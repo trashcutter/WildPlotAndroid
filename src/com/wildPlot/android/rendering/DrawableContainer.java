@@ -13,10 +13,10 @@
  * You should have received a copy of the GNU General Public License along with         *
  * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
  ****************************************************************************************/
-package com.wildplot.android.rendering;
+package com.wildPlot.android.rendering;
 
-import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
-import com.wildplot.android.rendering.interfaces.Drawable;
+import com.wildPlot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildPlot.android.rendering.interfaces.Drawable;
 
 import java.util.Vector;
 

@@ -6,14 +6,14 @@
     <string name="ash_origin">origin (x,y)</string>
     <string name="ash_m">M (x,y)</string>
     <string name="ash_regression_settings">Regression settings</string>
-	<string name="hello">Hello World, WildAndroidActivity!</string>
+    <string name="hello">Hello World, WildAndroidActivity!</string>
     <string name="app_name">WildPlot</string>
     <string name="settings_fragment">Settings</string>
     <string name="calc_fragment">Calc</string>
     <string name="plot_fragment">Plot</string>
     <string name="ode_fragment">ODE start</string>
     <string name="integrator_fragment">Integrator</string>
-    
+
     <string name="reset_all">reset everything</string>
     <string name="range_settings">Range Settings</string>
     <string name="x_range">x-range</string>
@@ -31,7 +31,7 @@
     <string name="int_number_steps">Number of steps:</string>
     <string name="int_preset_number_steps">20000</string>
     <string name="int_start_integrator">start Integrator</string>
-    
+
     <string name="ode_number_steps">Number of steps:</string>
     <string name="ode_preset_number_steps">20000</string>
     <string name="ode_start_integrator">start ODE solver</string>
@@ -45,4 +45,7 @@
     <string name="kde_settings_kernel">Kernel</string>
     <string name="settings_setup_kde_button">setup</string>
     <string name="settings_regression_topic">Regression Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

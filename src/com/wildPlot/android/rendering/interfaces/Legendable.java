@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License along with         *
  * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
  ****************************************************************************************/
-package com.wildplot.android.rendering.interfaces;
+package com.wildPlot.android.rendering.interfaces;
 
-import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildPlot.android.rendering.graphics.wrapper.ColorWrap;
 
 public interface Legendable {
     public ColorWrap getColor();

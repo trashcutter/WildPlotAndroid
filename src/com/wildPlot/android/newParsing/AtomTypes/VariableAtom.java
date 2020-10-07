@@ -1,9 +1,9 @@
-package com.wildplot.android.newParsing.AtomTypes;
+package com.wildPlot.android.newParsing.AtomTypes;
 
-import com.wildplot.android.newParsing.Atom;
-import com.wildplot.android.newParsing.ExpressionFormatException;
-import com.wildplot.android.newParsing.TopLevelParser;
-import com.wildplot.android.newParsing.TreeElement;
+import com.wildPlot.android.newParsing.Atom;
+import com.wildPlot.android.newParsing.ExpressionFormatException;
+import com.wildPlot.android.newParsing.TopLevelParser;
+import com.wildPlot.android.newParsing.TreeElement;
 
 import java.util.regex.Pattern;
 

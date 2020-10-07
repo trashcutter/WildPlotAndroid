@@ -1,7 +1,7 @@
 // Matrix_z (int n, int m, complex c)
 // V()
 
-package com.wildplot.MyMath;
+package com.wildPlot.MyMath;
 
 public class Matrix_z
 {

@@ -1,4 +1,4 @@
-package com.wildplot.android;
+package com.wildPlot.android;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,19 +6,19 @@ import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.util.Log;
-import com.wildplot.android.control.FunctionParserWrapper;
-import com.wildplot.android.densityFunctions.ASH;
-import com.wildplot.android.densityFunctions.Density2D;
-import com.wildplot.android.densityFunctions.KDE;
-import com.wildplot.android.kernelFunctions.*;
-import com.wildplot.android.newParsing.TopLevelParser;
-import com.wildplot.android.parsing.FunctionParser;
-import com.wildplot.android.parsing.SplineInterpolation;
-import com.wildplot.android.regressionFunctions.LinearRegression;
-import com.wildplot.android.rendering.*;
-import com.wildplot.android.rendering.graphics.wrapper.BufferedImageWrap;
-import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
-import com.wildplot.android.rendering.interfaces.*;
+import com.wildPlot.android.control.FunctionParserWrapper;
+import com.wildPlot.android.densityFunctions.ASH;
+import com.wildPlot.android.densityFunctions.Density2D;
+import com.wildPlot.android.densityFunctions.KDE;
+import com.wildPlot.android.kernelFunctions.*;
+import com.wildPlot.android.newParsing.TopLevelParser;
+import com.wildPlot.android.parsing.FunctionParser;
+import com.wildPlot.android.parsing.SplineInterpolation;
+import com.wildPlot.android.regressionFunctions.LinearRegression;
+import com.wildPlot.android.rendering.*;
+import com.wildPlot.android.rendering.graphics.wrapper.BufferedImageWrap;
+import com.wildPlot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildPlot.android.rendering.interfaces.*;
 
 
 
@@ -310,7 +310,7 @@ public class GlobalDataUnified extends Application {
 			this.yaxis.setLog();
 		}
 		if(hasFrame){
-			this.plotSheet.setFrameThickness(frameBorderPixelSize);
+			this.plotSheet.setFrameThickness(frameBorderPixelSize, frameBorderPixelSize, frameBorderPixelSize, frameBorderPixelSize);
 			if(this.isAxisOnFrame) {
 				xaxis.setOnFrame();
 				yaxis.setOnFrame();
@@ -426,7 +426,7 @@ public class GlobalDataUnified extends Application {
             //set good parameters to use relief better
             xaxis.setOnFrame();
             yaxis.setOnFrame();
-            plotSheet.setFrameThickness(frameBorderPixelSize); //to be able to show legend
+            plotSheet.setFrameThickness(frameBorderPixelSize,frameBorderPixelSize,frameBorderPixelSize,frameBorderPixelSize); //to be able to show legend
             TopLevelParser func3D = new TopLevelParser(funcExpression3D, this.parserRegister);
             parserRegister.put(func3D.getFuncName(), func3D);
 
@@ -445,8 +445,8 @@ public class GlobalDataUnified extends Application {
                     this.widthY, ColorWrap.red);
             histogramX.setFilling(true);
             histogramY.setFilling(true);
-            histogramX.setFillColorWrap(new ColorWrap(0f, 1f, 0f, 0.5f));
-            histogramY.setFillColorWrap(new ColorWrap(0f, 1f, 0f, 0.5f));
+            histogramX.setFillColor(new ColorWrap(0f, 1f, 0f, 0.5f));
+            histogramY.setFillColor(new ColorWrap(0f, 1f, 0f, 0.5f));
             Function2D kernelFunc;
             switch (kernel) {
                 case Uniform:

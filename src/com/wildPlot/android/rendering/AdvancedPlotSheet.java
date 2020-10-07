@@ -1,15 +1,15 @@
 /**
  * 
  */
-package com.wildplot.android.rendering;
+package com.wildPlot.android.rendering;
 
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.wildplot.android.rendering.graphics.wrapper.*;
-import com.wildplot.android.rendering.graphics.wrapper.BufferedImageWrap;
-import com.wildplot.android.rendering.interfaces.Drawable;
+import com.wildPlot.android.rendering.graphics.wrapper.*;
+import com.wildPlot.android.rendering.graphics.wrapper.BufferedImageWrap;
+import com.wildPlot.android.rendering.interfaces.Drawable;
 
 
 /**
@@ -25,7 +25,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 	private RectangleWrap field;
 
 	private boolean hasFirstPixelSkipSet = false;
-	private int firstPixelSkip = 20;
+	private float firstPixelSkip = 20;
 	private ReliefDrawer reliefDrawer = null;
 	
 
@@ -77,7 +77,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		Vector<DrawableDrawingRunnable> onFrameDrawables = new Vector<DrawableDrawingRunnable>();
 		//System.err.println("APlotSheet: field: " + field.width + " : " + field.height);
 		BufferedImageWrap bufferedFrameImage = new BufferedImageWrap(field.width, field.height, BufferedImageWrap.TYPE_INT_ARGB);
-		GraphicsWrap2D gFrame = bufferedFrameImage.createGraphics();
+		GraphicsWrap gFrame = bufferedFrameImage.createGraphics();
 		gFrame.setClip(field);
 		gFrame.setColor(ColorWrap.BLACK);
 		Thread[] threads = new Thread[this.screenParts.get(currentScreen).getDrawables().size()]; 
@@ -99,46 +99,64 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		
 		//paint white frame to over paint everything that was drawn over the border 
 		ColorWrap oldColorWrap = gFrame.getColor();
-		if(this.frameThickness>0){
+
+		boolean hasFrame = false;
+		if(this.upperFrameThickness>0){
+			hasFrame = true;
 			gFrame.setColor(ColorWrap.WHITE);
 			//upper frame
-			gFrame.fillRect(0, 0, field.width, this.frameThickness);
+			gFrame.fillRect(0, 0, field.width, this.upperFrameThickness);
+		}
 
+		if(this.leftFrameThickness > 0){
+			hasFrame = true;
+			gFrame.setColor(ColorWrap.WHITE);
 			//left frame
-			gFrame.fillRect(0, this.frameThickness, this.frameThickness, field.height);
-			
+			gFrame.fillRect(0, 0, this.leftFrameThickness, field.height);
+		}
+
+		if(this.rightFrameThickness>0){
+			hasFrame = true;
+			gFrame.setColor(ColorWrap.WHITE);
 			//right frame
-			gFrame.fillRect(field.width+1-this.frameThickness, this.frameThickness,this.frameThickness+2, field.height-this.frameThickness);
-			
+			gFrame.fillRect(field.width+1-this.leftFrameThickness, 0,this.rightFrameThickness+2, field.height);
+		}
+
+		if(this.bottomFrameThickness>0){
+			hasFrame = true;
+			gFrame.setColor(ColorWrap.WHITE);
 			//bottom frame
-			gFrame.fillRect(this.frameThickness, field.height-this.frameThickness, field.width-this.frameThickness,this.frameThickness+1);
-			
+			gFrame.fillRect(0, field.height-this.upperFrameThickness, field.width,this.bottomFrameThickness+1);
+		}
+
+		if(hasFrame){
+
 			//make small black border frame
 			if(isBordered){
 				gFrame.setColor(ColorWrap.black);
 				//upper border
-				gFrame.fillRect(this.frameThickness-borderThickness+1, this.frameThickness-borderThickness+1, field.width-2*this.frameThickness+2*borderThickness-2, borderThickness);
-				
+				gFrame.fillRect(this.leftFrameThickness-borderThickness+1, this.upperFrameThickness-borderThickness+1, field.width-this.leftFrameThickness-this.rightFrameThickness+2*borderThickness-2, borderThickness);
+
 				//lower border
-				gFrame.fillRect(this.frameThickness-borderThickness+1, field.height-this.frameThickness, field.width-2*this.frameThickness+2*borderThickness-2, borderThickness);
-				
+				gFrame.fillRect(this.leftFrameThickness-borderThickness+1, field.height-this.bottomFrameThickness, field.width-this.leftFrameThickness-this.rightFrameThickness+2*borderThickness-2, borderThickness);
+
 				//left border
-				gFrame.fillRect(this.frameThickness-borderThickness+1, this.frameThickness-borderThickness+1, borderThickness, field.height-2*this.frameThickness+2*borderThickness-2);
-				
+				gFrame.fillRect(this.leftFrameThickness-borderThickness+1, this.upperFrameThickness-borderThickness+1, borderThickness, field.height-this.upperFrameThickness-this.bottomFrameThickness+2*borderThickness-2);
+
 				//right border
-				gFrame.fillRect(field.width-this.frameThickness, this.frameThickness-borderThickness+1, borderThickness, field.height-2*this.frameThickness+2*borderThickness-2);
-				
+				//gFrame.fillRect(field.width-this.frameThickness, this.frameThickness-borderThickness+1, borderThickness, field.height-2*this.frameThickness+2*borderThickness-2);
+
 			}
-			
+
 			gFrame.setColor(oldColorWrap);
-			
+
 //			Font oldFont = gFrame.getFont();
 //			gFrame.setFont(oldFont.deriveFont(20.0f));
 			FontMetricsWrap fm = gFrame.getFontMetrics();
-			int height = fm.getHeight();
-			
-			int width = fm.stringWidth(this.title);
-			gFrame.drawString(this.title, field.width/2 -width/2, this.frameThickness - 10 - height);
+			float height = fm.getHeight();
+
+			float width = fm.stringWidth(this.title);
+			gFrame.drawString(this.title, field.width/2 -width/2, this.upperFrameThickness - 10 - height);
 //			gFrame.setFont(oldFont);
 		}
 		gFrame.dispose();
@@ -217,7 +235,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 				}
 			}
 			BufferedImageWrap buffTempImage = new BufferedImageWrap(field.width, field.height, BufferedImageWrap.TYPE_INT_ARGB);
-			GraphicsWrap2D g =  buffTempImage.createGraphics();
+			GraphicsWrap g =  buffTempImage.createGraphics();
 			g.setClip(field);
 			
 			for(DrawableDrawingRunnable offFrameDrawable : offFrameDrawables){
@@ -397,7 +415,7 @@ public class AdvancedPlotSheet extends PlotSheet implements Runnable{
 		public void run() {
 		    this.hasFinished = false;
 			bufferedDrawableImage = new BufferedImageWrap(field.width, field.height, BufferedImageWrap.TYPE_INT_ARGB);
-			GraphicsWrap2D g = bufferedDrawableImage.createGraphics();
+			GraphicsWrap g = bufferedDrawableImage.createGraphics();
 			g.setClip(field);
 			g.setColor(ColorWrap.BLACK);
 			drawable.paint(g);

@@ -13,15 +13,14 @@
  * You should have received a copy of the GNU General Public License along with         *
  * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
  ****************************************************************************************/
-package com.wildplot.android.rendering;
+package com.wildPlot.android.rendering;
 
 
 import android.graphics.Typeface;
 import android.util.Log;
-import com.ichi2.anki.AnkiDroidApp;
-import com.wildplot.android.rendering.graphics.wrapper.*;
-import com.wildplot.android.rendering.interfaces.Drawable;
-import com.wildplot.android.rendering.interfaces.Legendable;
+import com.wildPlot.android.rendering.graphics.wrapper.*;
+import com.wildPlot.android.rendering.interfaces.Drawable;
+import com.wildPlot.android.rendering.interfaces.Legendable;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -425,7 +424,6 @@ public class PlotSheet implements Drawable {
             float currentPixelWidth = xPointer;
 
             int legendCnt = 0;
-            Log.d(AnkiDroidApp.TAG, "should draw legend now, number of legend entries: " + mLegendMap.size());
             for(String legendName : keySet){
 
                 float stringWidth = fm.stringWidth(" : "+legendName);
@@ -442,7 +440,6 @@ public class PlotSheet implements Drawable {
                 g.setColor(ColorWrap.BLACK);
                 g.drawString(" : "+legendName, xPointer + rectangleSize , ySpacer+rectangleSize);
                 xPointer += rectangleSize*1.3f + stringWidth;
-                Log.d(AnkiDroidApp.TAG, "drawing a legend Item: (" + legendName + ") " + (legendCnt - 1) + ", x: " + (xPointer + rectangleSize) + ", y: " + (ySpacer + rectangleSize));
 
             }
             g.setFontSize(oldFontSize);
@@ -650,7 +647,6 @@ public class PlotSheet implements Drawable {
 		while((deltaRange/(tics))/2 >= ticlimit) {
 			tics *= 2.0;
 		}
-        Log.d(AnkiDroidApp.TAG, "PlotSheet ticksCalcY: pixelDistance: " + pixelDistance + ", ticks: " + tics);
 		return tics;
 	}
 	

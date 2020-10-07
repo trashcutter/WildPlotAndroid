@@ -1,6 +1,6 @@
-package com.wildplot.android.newParsing;
+package com.wildPlot.android.newParsing;
 
-import com.wildplot.android.newParsing.AtomTypes.*;
+import com.wildPlot.android.newParsing.AtomTypes.*;
 
 /**
  *

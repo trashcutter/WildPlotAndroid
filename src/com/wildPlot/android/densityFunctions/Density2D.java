@@ -1,8 +1,8 @@
-package com.wildplot.android.densityFunctions;
+package com.wildPlot.android.densityFunctions;
 
 
-import com.wildplot.android.rendering.interfaces.Function2D;
-import com.wildplot.android.rendering.interfaces.Function3D;
+import com.wildPlot.android.rendering.interfaces.Function2D;
+import com.wildPlot.android.rendering.interfaces.Function3D;
 
 public class Density2D implements Function3D {
 

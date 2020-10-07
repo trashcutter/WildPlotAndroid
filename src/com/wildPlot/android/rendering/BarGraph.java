@@ -13,14 +13,14 @@
  * You should have received a copy of the GNU General Public License along with         *
  * this program.  If not, see <http://www.gnu.org/licenses/>.                           *
  ****************************************************************************************/
-package com.wildplot.android.rendering;
+package com.wildPlot.android.rendering;
 
-import com.wildplot.android.rendering.graphics.wrapper.ColorWrap;
-import com.wildplot.android.rendering.graphics.wrapper.GraphicsWrap;
-import com.wildplot.android.rendering.graphics.wrapper.RectangleWrap;
-import com.wildplot.android.rendering.interfaces.Drawable;
-import com.wildplot.android.rendering.interfaces.Function2D;
-import com.wildplot.android.rendering.interfaces.Legendable;
+import com.wildPlot.android.rendering.graphics.wrapper.ColorWrap;
+import com.wildPlot.android.rendering.graphics.wrapper.GraphicsWrap;
+import com.wildPlot.android.rendering.graphics.wrapper.RectangleWrap;
+import com.wildPlot.android.rendering.interfaces.Drawable;
+import com.wildPlot.android.rendering.interfaces.Function2D;
+import com.wildPlot.android.rendering.interfaces.Legendable;
 
 
 /**

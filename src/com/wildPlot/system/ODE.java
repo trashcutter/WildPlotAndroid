@@ -1,4 +1,4 @@
-package com.wildplot.system;
+package com.wildPlot.system;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -6,7 +6,7 @@ import java.util.Vector;
 
 import android.widget.ProgressBar;
 
-import com.wildplot.MyMath.Matrix_d;
+import com.wildPlot.MyMath.Matrix_d;
 
 
 

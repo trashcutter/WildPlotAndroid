@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".PlotView" >
 
-    <com.wildplot.android.PlotView
+    <com.wildPlot.android.PlotView
         android:id="@+id/plot_view"
         style="@style/PlotTheme"
         android:layout_width="wrap_content"

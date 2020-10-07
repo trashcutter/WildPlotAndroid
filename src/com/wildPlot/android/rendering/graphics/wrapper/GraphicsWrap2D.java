@@ -1,4 +1,4 @@
-package com.wildplot.android.rendering.graphics.wrapper;
+package com.wildPlot.android.rendering.graphics.wrapper;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

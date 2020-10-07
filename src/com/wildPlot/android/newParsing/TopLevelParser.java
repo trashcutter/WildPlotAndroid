@@ -1,7 +1,7 @@
-package com.wildplot.android.newParsing;
+package com.wildPlot.android.newParsing;
 
-import com.wildplot.android.rendering.interfaces.Function2D;
-import com.wildplot.android.rendering.interfaces.Function3D;
+import com.wildPlot.android.rendering.interfaces.Function2D;
+import com.wildPlot.android.rendering.interfaces.Function3D;
 
 import java.util.HashMap;
 import java.util.Random;

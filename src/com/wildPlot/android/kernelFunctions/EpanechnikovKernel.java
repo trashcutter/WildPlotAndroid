@@ -1,7 +1,7 @@
-package com.wildplot.android.kernelFunctions;
+package com.wildPlot.android.kernelFunctions;
 
 
-import com.wildplot.android.rendering.interfaces.Function2D;
+import com.wildPlot.android.rendering.interfaces.Function2D;
 
 public class EpanechnikovKernel implements Function2D {
 

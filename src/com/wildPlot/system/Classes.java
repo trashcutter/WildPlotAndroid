@@ -1,4 +1,4 @@
-package com.wildplot.system;
+package com.wildPlot.system;
 
 public class Classes {
 

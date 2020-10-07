@@ -1,4 +1,4 @@
- package com.wildplot.android.parsing;
+ package com.wildPlot.android.parsing;
 
 import java.util.HashMap;
 

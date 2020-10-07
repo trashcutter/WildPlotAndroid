@@ -1,24 +1,38 @@
 buildscript {
+    ext {
+        kotlin_version = '1.4.10'
+    }
     repositories {
-        mavenCentral()
+        google()
+        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath "com.android.tools.build:gradle:4.0.2"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 dependencies {
-    compile 'com.android.support:support-v4:20.0.+'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.viewpager:viewpager:1.0.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 }
 
+
+
 android {
-    compileSdkVersion 18
-    buildToolsVersion '20'
+    compileSdkVersion 28
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 20
+        minSdkVersion 27
+        targetSdkVersion 27
     }
     sourceSets {
         main {
@@ -31,8 +45,11 @@ android {
             assets.srcDirs = ['assets']
         }
 
-        instrumentTest.setRoot('tests')
-        debug.setRoot('build-types/debug')
-        release.setRoot('build-types/release')
+        //instrumentTest.setRoot('tests')
     }
+}
+
+repositories {
+    google()
+    jcenter()
 }

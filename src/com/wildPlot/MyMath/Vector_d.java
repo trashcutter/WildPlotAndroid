@@ -1,6 +1,6 @@
-package com.wildplot.MyMath;
+package com.wildPlot.MyMath;
 
-import com.wildplot.system.Vec_d;
+import com.wildPlot.system.Vec_d;
 
 public class Vector_d
 {

@@ -1,6 +1,6 @@
-package com.wildplot.android.parsing;
+package com.wildPlot.android.parsing;
 
-import com.wildplot.android.rendering.interfaces.Function2D;
+import com.wildPlot.android.rendering.interfaces.Function2D;
 
 
 
